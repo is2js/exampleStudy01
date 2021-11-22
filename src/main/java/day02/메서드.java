@@ -1,7 +1,7 @@
 package day02;
 
 public class 메서드 {
-    // 변수 -> 중복되는 값을 재활용하며 바꾸기  ex> sout(1) sout(1) sout(1)  -> a = 1; sout(a) sout(a) sout(a)
+    // 변수 -> 중복되는 값을 재활용하며 바꿔쓰기  ex> sout(1) sout(1) sout(1)  -> a = 1; sout(a) sout(a) sout(a)
     // 메서드 -> 중복되는 코드를 재활용하며 값 바꿔쓰기
     // 주의점) 메서드 -> 메서드는 서로 독립적이다 -> 메서드안에 메서드를 만들어 쓸 수 없다.
     // --->  main메서드안에 메서드를 정의할수 X
