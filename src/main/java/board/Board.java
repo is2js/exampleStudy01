@@ -5,15 +5,13 @@ import java.util.Scanner;
 
 public class Board {
 
+    Scanner scanner = new Scanner(System.in);
+    ArrayList<String> titles = new ArrayList<>();
+    ArrayList<String> bodies = new ArrayList<>();
+    ArrayList<Integer> numbers = new ArrayList<>();
+    int no = 1;
+
     public void runBoard() {
-        Scanner scanner = new Scanner(System.in);
-        ArrayList<String> titles = new ArrayList<>();
-        ArrayList<String> bodies = new ArrayList<>();
-        // 6. autoincrement no를 저장할 list도 만들어주기
-        ArrayList<Integer> numbers = new ArrayList<>();
-        // 4. 게시물 고유번호 1부터해서 add호출시마다 1씩 증가 update
-        // -> 반복문 밖에서 초기화하기
-        int no = 1;
 
         while (true) {
             System.out.print("명령어를 입력해주세요 : ");
@@ -30,9 +28,6 @@ public class Board {
                 continue;
             }
             if (command.equals("add")) {
-                // 3. 게시물 고유번호는, 1부터 중복안되게 자동으로 1개씩 증가시키면 된다.
-                // -> 1) int no = 1; 반복할때마다 초기화 안되게, 밖에서 선언해주고 반복-add시맏 update만 되도록 밖으로 빼기
-                // 5. -> 2) 갔다와보니.. 1씩 증가하는 no를 저장할 ArrayList도 따로.. -> 생성하고 오기
                 System.out.print("제목을 입력해주세요 : ");
                 String title = scanner.nextLine();
                 System.out.print("내용을 입력해주세요 : ");
@@ -40,80 +35,103 @@ public class Board {
                 titles.add(title);
                 bodies.add(body);
                 System.out.println("게시물이 저장되었습니다.");
-                // 7. 게시물 저장시, 해당 번호도 저장해주고, -> +1증가시키기
-                // -> 조회(list)에서 번호도 수정해주자.
                 numbers.add(no);
                 no++;
                 continue;
             }
             if (command.equals("list")) {
-                System.out.println(">>>>>>>>" + titles.size());
-                for (int i = 0; i < titles.size(); i++) {
-                    String title = titles.get(i);
-//                    String body = bodies.get(i);
-                    // 8. 번호를 index- > 고유번호 numbers에서 꺼내오기
-                    int number = numbers.get(i);
-                    //                    System.out.println("번호 : " + (i + 1));
-                    System.out.println("번호 : " + number);
-                    System.out.println("제목 : " + title);
-                    // 9. body는 안보여주기
-                    //                    System.out.println("내용 : " + body);
-                    System.out.println("====================================");
-                }
+                list();
                 continue;
             }
-            // 1. update(수정)은 id값을 입력받아서 특정 게시물만 수정해야한다.
-            // -> index가 아닌 고유번호다 앞에께 삭제되더라도 땡겨가는 일은 없어야한다.
-            //            명령어를 입력해주세요 : update
-            //            수정할 게시물 번호 : 3
-            //            없는 게시물 번호입니다.
-            //                    명령어를 입력해주세요 : update
-            //            수정할 게시물 번호 : 1
-            //            제목 : 새제목
-            //            내용 : 새내용
-            //            수정이 완료되었습니다.
-            //            번호 : 1
-            //            제목 : 새제목
             if (command.equals("update")) {
                 System.out.print("수정할 게시물 번호 : ");
-                // 2. 숫자가 필요할땐 nextLine -> parseInt
-                // -> 게시물번호는 index가 아니다! 고유번호가 필요하다.
-                // -> add할 때, 데이터로서 추가해줘야한다. add로 갔다오자.
                 int target = Integer.parseInt(scanner.nextLine());
 
-                // 10. 게시물을 입력받은 고유번호로 검색할건데,
-                // **어떤 값이 배열에 어딨는지는 index가 아닌 이상  for문으로 검색해봐야 안다.**
-                // System.out.println("검색안하고 list.indexOf()로 index찾기 >>> " +
-                // numbers.indexOf(target));
-                // -> 우리가 찾는 것은 index -> **반복문내에서 찾아서 건져내야하기 때문에. 또 변수 생성. ㅠ
-                int targetIndex = -1; // 조심!! 초기화를 0으로 하면 안됨. 0은 의미 있는 index번호임.
-                for (int i = 0; i < numbers.size(); i++) {
-                    if (numbers.get(i) == target) {
-                        targetIndex = i;
-                        break; // 찾았으면 break로 빠져나와야한다.
-                    }
-                }
-                // 11. **targetIndex를 못찾을 수 도 있다.**
-                // -> for문으로 배열속 값 찾기시 -> 값을 못찾았을 수도 있다 -> 초기화 값 활용하기
-                // -> 못찾았으면 if not return, continue, break;와 마찬가지.
+                // 3. 삭제시에도 사용되는 index검색코드를 함수화한다.
+                // -> 일단은 void로  작성해두고,, 찾은 index를 돌려주도록 하자.
+                // -> 찾을 때 필요한 input target번호를 넣어주자.
+//                getIndexOfArticleNumber(target)
+                int targetIndex = getIndexOfArticleNumber(target);
+
                 if (targetIndex == -1) {
                     System.out.println("없는 게시물입니다.");
                     continue;
                 }
-                // 12. 해당 게시물에 대한 index를 찾았으면, 새내용을 입력받아서  수정(set)해야한다.
+
                 System.out.println("수정할 게시물 번호 : " + targetIndex);
                 System.out.print("제목 : ");
                 String title = scanner.nextLine();
                 System.out.print("내용 : ");
                 String body = scanner.nextLine();
-                // arraylist.set(index, value)으로 수정해주기
                 titles.set(targetIndex, title);
                 bodies.set(targetIndex, body);
                 System.out.println("수정이 완료되었습니다.");
+
+                // 1.list(조회)같은 경우, 자신 부피뿐만 아니라 다른데서도 많이 쓰이므로 리스트로 뺀다.
+                list();
+
                 continue;
             }
 
+            // 2. 삭제의 경우, 수정과 비슷하지만 더 쉽다.
+            // 명령어를 입력해주세요 : delete
+            // 삭제할 게시물 번호 : 3
+            // 없는 게시물 번호입니다.
+            // 명령어를 입력해주세요 : delete
+            // 삭제할 게시물 번호 : 1
+            // 삭제가 완료되었습니다.
+            if (command.equals("delete")) {
+                System.out.print("삭제할 게시물 번호 : ");
+                int target = Integer.parseInt(scanner.nextLine());
+                //6. 수정과 중복되는 코드 -> 리팩토링된 코드를 활용해서 index를 찾는다.
+                int targetIndex = getIndexOfArticleNumber(target);
+
+                // 검색은 항상 못찾았을 때를 대비해야한다.
+                if (targetIndex == -1) {
+                    System.out.println("없는 게시물 번호입니다.");
+                    continue;
+                }
+                //7. delete는 찾은 index로 바로 remove대리면 된다. (수정처럼 추가데이터 받지x)
+                titles.remove(targetIndex);
+                bodies.remove(targetIndex);
+                numbers.remove(targetIndex);
+                System.out.println("삭제가 완료되었습니다.");
+
+                list();
+            }
+
             System.out.println("잘못 입력하였습니다.");
+        }
+    }
+
+    //4. 결국 찾은 index를 return해줘야한다. -> 찾으면 그값, 못찾으면 default -1
+    // -> for반복문으로 검색하는 코드가 메소드 안으로 들어왔다면, for에서 받검색시 찾았을 때 받아주는 변수도 필요없다 찾으면 바로 return
+//    private void getIndexOfArticleNumber(int target) {
+    private int getIndexOfArticleNumber(int target) {
+//        int targetIndex = -1;
+
+        for (int i = 0; i < numbers.size(); i++) {
+            if (numbers.get(i) == target) {
+//                targetIndex = i;
+                //중요!
+//                break;
+                return i;
+            }
+        }
+        //중요!
+//        return targetIndex;
+        return -1;
+
+    }
+
+    public void list() {
+        for (int i = 0; i < titles.size(); i++) {
+            int number = numbers.get(i);
+            String title = titles.get(i);
+            String body = bodies.get(i);
+            System.out.println("번호 : " + number);
+            System.out.println("제목 : " + title);
+            System.out.println("====================================");
         }
     }
 }
