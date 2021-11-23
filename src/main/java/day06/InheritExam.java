@@ -27,7 +27,11 @@ public class InheritExam {
         k9.autoDriving();
 
         SupercCar 람보르기니 = new SupercCar("람보르기니", 2000);
-        람보르기니.turbo();
+//        람보르기니.turbo();
+        람보르기니.turboOff();
+        람보르기니.run(); // 오버라이딩해서 부모 기능 수정했음
+        람보르기니.turboOn();
+        람보르기니.run(); // 오버라이딩해서 부모 기능 수정했음
 
 
     }
