@@ -1,67 +1,61 @@
 # 게시판 만들기
 1. 1강
-   1. 핵심로직(Board)에서 no main -> runPrompt, runBoard method에서 무한반복 입력기 돌리기
+   1. 핵심로직(Board)에서 no main -> runPrompt, runBoard() method에서 무한반복 입력기 돌리기
       1. 참고로 미션은.. Application.java에서
-         1. [현구막](https://github.com/Hyeon9mak/java-subway-path-precourse/blob/Hyeon9mak/src/main/java/subway/Application.java), [준서](https://github.com/KJunseo/java-subway-path-precourse/blob/KJunseo/src/main/java/subway/Application.java), [빙해](https://github.com/binghe819/java-subway-path-precourse/blob/binghe/src/main/java/subway/Application.java)  [빙해뷰폴더](https://github.com/binghe819/java-subway-path-precourse/tree/binghe/src/main/java/subway/view)
-            ```java
-               - 준서
-            final Scanner scanner = new Scanner(System.in);
-            InputView inputView = new InputView(scanner);
-            SubwayPath subwayPath = new SubwayPath(inputView);
-             boolean running = true;
-             while (running) {
-             running = subwayPath.run();
-             }
-               - 빙해
-            final Scanner scanner = new Scanner(System.in);
-            InputView.scanner = scanner;
-            initSetting();
-            MainView mainView = new MainView();
-            mainView.setVisible();
-               - 현구막
-            final Scanner scanner = new Scanner(System.in);
-            UserInput.giveScanner(scanner);
-            SubwayPath subwayPath = SubwayPath.newSubwayPath();
-            subwayPath.start();
-            ```
-   
       2. 실행 기능을 가진 Main 클래스 만들어서 main메소드로 Board객체를 만들어 핵심로직 인스턴스 method 돌리기
-      3. if분기별로 처리하기 -> help -> add(추가) -> list(조회) 순... -> 맨 마지막 분기에 안걸리는 예외처리하기
-   2. 
+      3. if분기별로 처리하기 -> **`help -> add(추가) -> list(조회)`** 순... -> 맨 마지막 분기에 안걸리는 예외처리하기
+2. 2강
+   1. update시 입력받는 게시물번호는 index가 아니라 고유번호다 -> 고유번호도 데이터로서 add할 떄,넣어줘야한다.
+      1. 앞에께 삭제되더라도 땡겨가는 일은 없어야한다.
+   2. 고유번호 ->  autouincrement 구현 -> 그것을 저장하는 자료구조도 또 구현
+   3. update시 입력받은 게시물고유번호로 -> 3 list의 index를 찾아야하는데
+      1. my)list.indexOf(value)로 index를 찾을 수 있지만
+      2. 강사는 어떤 값이 배열 어디에 위치(index)를 알 수없으니 for문으로 돌아서 검색해야 된다고 한다.
+   4. update시 게시물을 찾다가 없을 수 도 있다. -> targetIndex에 초기화값(-1)이 그대로 있을 것이다 `초기화 값 활용`!!
+      1. **`for문으로 배열속 값 찾기`시에 -> 찾았는데 없을 때, 초기화 값으로 확인해주는 sense 활용~!!**
+      2. 
 
 ## 기능 목록
 
 ## 기능 요구 사항
 
-1. 요구사항
+1. 요구사항 1->2
 ```
-// 명령어를 입력해주세요 : (출력) help(입력)
-// add  : 게시물 등록 (출력)
-// list : 게시물 목록 조회 (출력)
+/* 요구사항 : 게시물 수정
 
-// 명령어를 입력해주세요 : (출력) add(입력)
-// 제목을 입력해주세요 : (출력) 안녕하세요(입력)
-// 내용을 입력해주세요 : (출력) 반갑습니다(입력)
-// 게시물이 저장되었습니다. (출력)
+1. 게시물 수정 기능 구현. 명령어 : update
 
-// 명령어를 입력해주세요 : (출력) list(입력)
-// 번호 : 1(출력)
-// 제목 : 안녕하세요(출력)
-// 내용 : 반갑습니다(출력)
-// ====================================(출력)
+2. 원하는 게시물을 선택해 수정할 수 있어야 합니다. -> 게시물을 구별할 수 있는 식별자가 필요합니다.(게시물 번호)
 
-// 명령어를 입력해주세요 : (출력) add(입력)
-// 제목을 입력해주세요 : (출력) 안녕하세요2(입력)
-// 내용을 입력해주세요 : (출력) 반갑습니다2(입력)
-// 게시물이 저장되었습니다. (출력)
+3. 내용은 길이가 매우 길 수도 있기 때문에 게시물 목록을 보여줄 때는 보통 보여주지 않습니다. 목록에서 내용을 지워주세요.
 
-// 명령어를 입력해주세요 : (출력) list(입력)
-// 번호 : 1(출력)
-// 제목 : 안녕하세요(출력)
-// 내용 : 반갑습니다(출력)
-// ====================================(출력)
-// 번호 : 2(출력)
-// 제목 : 안녕하세요2(출력)
-// 내용 : 반갑습니다2(출력)
-// ====================================(출력)
+4. 올바르지 않은 게시물을 선택하면 게시물이 없다고 나와야 합니다.
+
+5. 수정이 완료되면 다시 목록을 보여주세요.
+
+- 입출력 예시
+`
+명령어를 입력해주세요 : list
+===================
+번호 : 1
+제목 : 제목2
+===================
+번호 : 2
+제목 : 제목2
+===================
+명령어를 입력해주세요 : update
+수정할 게시물 번호 : 3
+없는 게시물 번호입니다.
+명령어를 입력해주세요 : update
+수정할 게시물 번호 : 1
+제목 : 새제목
+내용 : 새내용
+수정이 완료되었습니다.
+번호 : 1
+제목 : 새제목
+===================
+번호 : 2
+제목 : 제목2
+===================
+*/
    ```
