@@ -1,37 +1,24 @@
 package board.test;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Test {
     public static void main(String[] args) {
-        String txt1 = "가나다라" ;
-        String txt2 = "해당 내용은 테스트 입니다" ;
-        String txt3 = "가격은 29,000원 입니다" ;
+        // LocalDate.now();
+        // 시스템에 default로 지정된 시간과 타임존을 이용하여 현재 날짜를 가져옵니다.
 
-        // contains를 이용한 방법(true, false 반환)
-        if(txt2.contains("테스트"))
-            System.out.println("문자열 있음!");
-        else
-            System.out.println("문자열 없음!");
+        // 현재 날짜 구하기 (시스템 시계, 시스템 타임존)
+        LocalDate now = LocalDate.now();
+        System.out.println(now); //
+        System.out.println(now.getClass()); //
+        // 7. 2021-06-17 -> 원하는형태 X 문자열 아님
 
-//        // indexOf를 이용한 방법
-//        if(txt2.indexOf("테스트") > -1)
-//            System.out.println("문자열 있음!");
-//        else
-//            System.out.println("문자열 없음!");
-//
-//
-//        // matches를 이용한 방법
-//        if(txt2.matches(".*테스트.*"))
-//            System.out.println("문자열 있음!");
-//        else
-//            System.out.println("문자열 없음!");
-//
-//
-//        // matches를 이용하여 정규 표현식으로 문자열에 숫자가 있는지 확인
-//        if(txt3.matches(".*[0-9].*"))
-//            System.out.println("숫자 있음!");
-//        else
-//            System.out.println("숫자 없음!");
-
-
+        // 8. 1) 원하는 포맷으로 포맷터 정의 -> 적용
+        // DateTimeFormatter.ofPattern("")로 포맷터를 정의 할 수 있다.
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        // LocalDate타입에 포맷터 적용과 동시에 -> 2) 문자열로도 바뀐다!!
+        System.out.println(now.format(dateTimeFormatter));
+        System.out.println(now.format(dateTimeFormatter).getClass());
     }
 }

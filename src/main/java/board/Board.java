@@ -1,5 +1,7 @@
 package board;
 
+import board.util.MyUtil;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -7,28 +9,13 @@ public class Board {
 
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
-    //2. 테스터데이터 넣어준만큼 시작을 뒤로.
-//    int no = 1;
-    int no = 1 + 3; // TODO: 테스트끝나면 +3삭제
+    int no = 1 + 3;
 
-    // 5. 인변의 초기화가 아니라, 인메사용 직전에, 인메 초반부 데이터 삽입코드를 인메사용용 개체 생성시 생성자에 넣어준다.
-    // -> 인메run()에 대한 초기코드를 인메run()사용을 위한 객체 생성시 수행하게 하여
-    // -> 인메run()의 첫부분을 더 앞으로 빼준다.
     public Board() {
         makeTestData();
     }
 
     public void runBoard() {
-        //1. 인메에서 사용된 인변에 미리 넣어두려면,
-        // -> 인메내부에서 시작할때 넣어줘야한다.
-        // -> 그리고 **넣어준만큼 인변 - 데이터시작번호no를 옮겨준다.**
-        //3. 테스트데이터 add과정을 method화 한다.
-//        makeTestDate();
-        //4. 메소드의 시작에 넣어야하는데, 메소드 메인로직을 가리므로,
-        // -> 인메의 첫시작부분은 인메사용을 위한 객체생성시 생성자에 넣어준다.!!
-        // -> 대박개념..
-
-
         while (true) {
             System.out.print("명령어를 입력해주세요 : ");
             String command = scanner.nextLine();
@@ -64,17 +51,20 @@ public class Board {
                 continue;
             }
 
-
             System.out.println("잘못 입력하였습니다.");
         }
     }
 
     private void makeTestData() {
-        articles.add(new Article(1, "안녕하세요", "내용1입니다."));
-        articles.add(new Article(2, "반갑습니다.", "내용2입니다."));
-        articles.add(new Article(3, "안녕안녕", "내용3입니다."));
+        // 2. 조회수는 0으로, 날짜는 "2021.11.11"형식으로 일단 넣어준다.
+        // 13. 테스트데이터도, run()실행용 객체가 생성될 떄 생성자에서 추가되는데, 실행되는 날짜로서 추가해준다.
+        articles.add(
+                new Article(1, "안녕하세요", "내용1입니다.", MyUtil.getCurrentDate("yyyy.MM.dd"), "익명", 0));
+        articles.add(
+                new Article(2, "반갑습니다.", "내용2입니다.", MyUtil.getCurrentDate("yyyy.MM.dd"), "익명", 0));
+        articles.add(
+                new Article(3, "안녕안녕", "내용3입니다.", MyUtil.getCurrentDate("yyyy.MM.dd"), "익명", 0));
     }
-
 
     private void searchArticles() {
         System.out.print("검색 키워드를 입력해주세요 : ");
@@ -88,7 +78,6 @@ public class Board {
             }
         }
         list(searchedArticles);
-
     }
 
     private void deleteArticle() {
@@ -121,7 +110,9 @@ public class Board {
         String title = scanner.nextLine();
         System.out.print("내용 : ");
         String body = scanner.nextLine();
-        Article article = new Article(target, title, body);
+        // 3. 추가나, 수정시 필요한 데이터들도 일단은, 받기전에 테스트데이터를 넣어준다.
+        // "2021.11.11", "익명", 0
+        Article article = new Article(target, title, body, "2021.11.11", "익명", 0);
         articles.set(targetIndex, article);
         System.out.println("수정이 완료되었습니다.");
 
@@ -133,7 +124,11 @@ public class Board {
         String title = scanner.nextLine();
         System.out.print("내용을 입력해주세요 : ");
         String body = scanner.nextLine();
-        Article article = new Article(no, title, body);
+
+        // 12. add할 때, 테스트 데이터 -> 현재날짜를 문자열로 받아와서 추가해준다.
+        String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
+
+        Article article = new Article(no, title, body, currentDate, "익명", 0);
         System.out.println("게시물이 저장되었습니다.");
 
         articles.add(article);
@@ -158,12 +153,19 @@ public class Board {
         return -1;
     }
 
+    // 4. 출력이자 조회 함수에다가, 추가데이터를 출력하도록 추가해준다.
+    //    작성자 : 익명
+    //    등록날짜 : 2020.10.22
+    //    조회수 : 20
     public void list(ArrayList<Article> list) {
         for (int i = 0; i < list.size(); i++) {
             Article article = list.get(i);
             System.out.println("번호 : " + article.id);
             System.out.println("제목 : " + article.title);
-            System.out.println("내용 : " + article.body);
+            //            System.out.println("내용 : " + article.body);
+            System.out.println("작성자 : " + article.writer);
+            System.out.println("등록날짜 : " + article.regDate);
+            System.out.println("조회수 : " + article.hit);
             System.out.println("====================================");
         }
     }
