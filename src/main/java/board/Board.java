@@ -7,9 +7,27 @@ public class Board {
 
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
-    int no = 1;
+    //2. 테스터데이터 넣어준만큼 시작을 뒤로.
+//    int no = 1;
+    int no = 1 + 3; // TODO: 테스트끝나면 +3삭제
+
+    // 5. 인변의 초기화가 아니라, 인메사용 직전에, 인메 초반부 데이터 삽입코드를 인메사용용 개체 생성시 생성자에 넣어준다.
+    // -> 인메run()에 대한 초기코드를 인메run()사용을 위한 객체 생성시 수행하게 하여
+    // -> 인메run()의 첫부분을 더 앞으로 빼준다.
+    public Board() {
+        makeTestData();
+    }
 
     public void runBoard() {
+        //1. 인메에서 사용된 인변에 미리 넣어두려면,
+        // -> 인메내부에서 시작할때 넣어줘야한다.
+        // -> 그리고 **넣어준만큼 인변 - 데이터시작번호no를 옮겨준다.**
+        //3. 테스트데이터 add과정을 method화 한다.
+//        makeTestDate();
+        //4. 메소드의 시작에 넣어야하는데, 메소드 메인로직을 가리므로,
+        // -> 인메의 첫시작부분은 인메사용을 위한 객체생성시 생성자에 넣어준다.!!
+        // -> 대박개념..
+
 
         while (true) {
             System.out.print("명령어를 입력해주세요 : ");
@@ -41,10 +59,7 @@ public class Board {
                 deleteArticle();
                 continue;
             }
-            //1. run()메소드가 리팩토링되었다면, 계속 리팩토링하도록 작성하자.
             if (command.equals("search")) {
-                //2. 검색의 결과는 복수개가 나올수 잇으니 복수로 메소드명을 짓는다!!
-                // -> 무한반복 분기마다 early continue를 마지막에 달아주자! 예외만 맨 마지막에 남음
                 searchArticles();
                 continue;
             }
@@ -54,36 +69,25 @@ public class Board {
         }
     }
 
+    private void makeTestData() {
+        articles.add(new Article(1, "안녕하세요", "내용1입니다."));
+        articles.add(new Article(2, "반갑습니다.", "내용2입니다."));
+        articles.add(new Article(3, "안녕안녕", "내용3입니다."));
+    }
+
 
     private void searchArticles() {
         System.out.print("검색 키워드를 입력해주세요 : ");
         String keyword = scanner.nextLine();
 
-        //7.
         ArrayList searchedArticles = new ArrayList();
 
-        //2. 검색하려면, 반복문으로 articles(arraylist) 싹다 뒤져봐야한다.
         for (int i = 0; i < articles.size(); i++) {
             if (articles.get(i).title.contains(keyword)) {
-                //3. 원하는 키워드를 포함했다면, 출력? 모아두기? -> 일단 출력해주자.
-                // -> 일부 list를 출력/조회하는 함수가 없기 때문이다.
-//                System.out.println("번호 : " + articles.get(i).id);
-//                System.out.println("제목 : " + articles.get(i).title);
-//                System.out.println("내용 : " + articles.get(i).body);
-//                System.out.println("====================================");
-                // -> test
-                //4. 이제 조회 list()함수를.. arraylist전체가 아닌...
-                // -> 여기서도 재활용할 수 있게 <파라미터로 Arraylist<Class>를 받아, 전체list가 아닌 일부list도 전체 다 출력되게> 리팩토링한다.
-
-                //6. 이제 일부 article list도 조회(출력)할 수 있게 파라미터를 심었으니,
-                // -> 검색된 article을 바로 출력 X -> 모아서 list로 건네주자.
                 searchedArticles.add(articles.get(i));
             }
         }
-        // 8. 검색된 결과를 list()조회->출력함수에 넘겨준다.
-        // -> 결과가 없어도 .size() 0처리되서 반복문이 안도니까 괜찮다.
         list(searchedArticles);
-        //
 
     }
 
@@ -154,9 +158,6 @@ public class Board {
         return -1;
     }
 
-    //5. <내부에 반복문을 도는 조회함수>는 조회시 길이가변을 자동처리하도록 ArrayList 파라미터로 받게 한다.
-    // -> 전체 list(articles), 일부list(articles), 정렬된list, 1개, 0개 다 가능해진다.
-//    public void list() {
     public void list(ArrayList<Article> list) {
         for (int i = 0; i < list.size(); i++) {
             Article article = list.get(i);
