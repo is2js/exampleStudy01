@@ -9,6 +9,8 @@ public class Board {
 
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
+    // 8. memeber저장용 db
+    ArrayList<Member> members = new ArrayList<>();
     int no = 1 + 3;
 
     public Board() {
@@ -50,32 +52,53 @@ public class Board {
                 searchArticles();
                 continue;
             }
-            //1. 새로운 명령어 대한 분기를 작성하고 함수를 작성한다.
             if (command.equals("read")) {
                 readArticles();
                 continue;
             }
+            // 1. 로그인을 안하면, 글쓰기 버튼 자체가 안뜬다. -> 작성자가 있으려면, 로그인부터 해야한다.
+            // -> 비로그인: 익명? / -> 로그인: 작성자 입력 구분해야한다?
 
+            // 2.회원을 저장해놓진 말고, 일단은 가입 폼(형태)만 작성해보자.
+            if (command.equals("signup")) {
+                signup();
+                continue;
+            }
 
             System.out.println("잘못 입력하였습니다.");
         }
     }
 
+    private void signup() {
+        // 3. 저장은 db없을 때는 -> add(추가)다.
+        // -> addAtricle() 코드를 복사해 와서 수정해서 작성한다.
+        // -> atricle에 add 해줄 title, body, 등을 -> loginId, loginPw,로 바꿔서 add(저장)해야한다.
+        System.out.print("아이디를 입력해주세요 : ");
+        String loginId = scanner.nextLine();
+        System.out.print("비밀번호를 입력해주세요 : ");
+        String loginPw = scanner.nextLine();
+        System.out.print("닉네임을 입력해주세요 : ");
+        String nickname = scanner.nextLine();
+
+        // 4. 자 이제, Article이 아닌 저장할 데이터용 Class를 만들어야한다.
+        // -> 데이터들은 Class로 묶어서 관리해야한다.
+        // -> Member class를 만들자. Article과는 전혀다른 개념이므로, 데이터를 추가하는게 아니라 새로 만들어야한다.
+        // -> 서로 다른 하나의 개념 -> class로 표현
+
+        // 6. class생성후, 해당 class의 구조체에 데이터를 넣어준다.
+        // - 가입일자는 생략한다.
+        // String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
+        Member member = new Member(loginId, loginPw, nickname);
+        // 7. 이제 articles같은, member저장용  arrayulist를 위에 만들어주고 오자.
+        // 9.
+        members.add(member);
+        System.out.println("회원가입이 완료되었습니다.");
+        //        no++; // 회원 고유번호는 따로 세지 않는다.
+
+    }
+
     private void readArticles() {
-        // 2. 기본적으로 뿌려지는 것을 완성해보자.
-        //        상세보기할 게시물 번호를 입력해주세요 : 1
-        //                ==== 1번 게시물 ====
-        //        번호 : 1
-        //        제목 : 제목1
-        //                -------------------
-        //                내용 : 안녕하세요 ~
-        //                -------------------
-        //                        작성자 : 익명
-        //        등록날짜: 2021.03.07
-        //                ===================
         System.out.print("상세보기할 게시물 번호를 입력해주세요 : ");
-        // 숫자를 받으니까 parseInt도 같이~
-        // 숫자 target(id) -> 메소드 -> arraylist 속 index 찾기 / 없으면 -1로 반환해서 early return(continue)
         int target = Integer.parseInt(scanner.nextLine());
         int targetIndex = getIndexOfArticleNumber(target);
 
@@ -83,9 +106,6 @@ public class Board {
             System.out.println("없는 게시물 번호입니다.");
             return;
         }
-        // id -> arraylist 속 index를 찾았다면, 꺼내야한다.
-        //3. index -1이 아니라서 return 안됬다면 상세보기됨 -> 조회수 1개 올려야한다!
-        // -> 조회수는 먼저 올리고 상세보기에서 올린 값을 보여줘야한다.
         Article article = articles.get(targetIndex);
         article.hit++;
         System.out.printf("==== %d번 게시물 ====\n", article.id);
@@ -98,7 +118,6 @@ public class Board {
         System.out.println("등록날짜 : " + article.regDate);
         System.out.println("조회수 : " + article.hit);
         System.out.println("===================");
-
     }
 
     private void makeTestData() {
@@ -114,7 +133,7 @@ public class Board {
         System.out.print("검색 키워드를 입력해주세요 : ");
         String keyword = scanner.nextLine();
 
-        ArrayList searchedArticles = new ArrayList();
+        ArrayList<Article> searchedArticles = new ArrayList();
 
         for (int i = 0; i < articles.size(); i++) {
             if (articles.get(i).title.contains(keyword)) {
