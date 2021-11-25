@@ -10,7 +10,11 @@ public class Board {
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
     ArrayList<Member> members = new ArrayList<>();
-    int no = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
+    //3. 게시물처럼, 데이터저장시 1부터 +1씩 되도록, 관리해주는 변수가 필요하다.
+    // -> 게시물 관리 변수: no -> articleNumber로 변경
+    // int no = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
+    int articleNumber = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
+    int memberNumber = 1 + 2; // 회원 고유번호
     Member loginedMember = null;
 
     public Board() {
@@ -41,13 +45,9 @@ public class Board {
                 continue;
             }
             if (command.equals("add")) {
-                // 8. 진입후 false 종료필터링을 -> 진입전 true 진입필터링으로 바꿔서 여기로 가져온다.
-                // -> 로그인이 필요한 곳마다 진입전에 체크하도록 한다.
-                // -> **이미 false시에는 로직실행X & (로그인필요)멘트가 나가므로 else처리는 할 필요없다? **
-                // -> **if true 진입필터링은, t/f반환메서드내부에서 false일때, 멘트(진입하려면 로그인 필요 등)를 꼭 날려주자 ->  진입못한 else처리 할 필요가 없어진다.**
-                if (isLoginCheck()==true) {
+                if (isLoginCheck() == true) {
                     addArticle();
-                } // false시 멘트 자동으로 나옴. "로그인 필요한 기능입니다"
+                }
                 continue;
             }
             if (command.equals("list")) {
@@ -79,10 +79,8 @@ public class Board {
                 login();
                 continue;
             }
-            // 1. 분기문 작성
             if (command.equals("logout")) {
-                //9. 로그아웃도 로그인검사를 "진입필터링 with 진입못할시 멘트"를 씌워주자.
-                if (isLoginCheck()==true) {
+                if (isLoginCheck() == true) {
                     logout();
                 }
                 continue;
@@ -93,11 +91,6 @@ public class Board {
     }
 
     private void logout() {
-        //3. 중복코드 함수화 됨.
-        // if (loginedMember == null) {
-        //     System.out.println("로그인이 필요한 기능입니다.");
-        //     return;
-        // }
         loginedMember = null;
         System.out.println("로그아웃 되셨습니다.");
     }
@@ -131,9 +124,12 @@ public class Board {
         System.out.print("닉네임을 입력해주세요 : ");
         String nickname = scanner.nextLine();
 
-        Member member = new Member(loginId, loginPw, nickname);
+        //4. 이제 멤버데이터를 넣어줄 때마다, 자동증가고유번호도 넣어주면서 -> 넣고나서 ++
+        // Member member = new Member(loginId, loginPw, nickname);
+        Member member = new Member(memberNumber, loginId, loginPw, nickname);
         members.add(member);
         System.out.println("회원가입이 완료되었습니다.");
+        memberNumber++; //
     }
 
     private void readArticles() {
@@ -153,7 +149,16 @@ public class Board {
         System.out.println("-------------------");
         System.out.println("내용 : " + article.body);
         System.out.println("-------------------");
-        System.out.println("작성자 : " + article.writer);
+        //11. 변경 -> test -> 여기까지 하면, 게시글의 작성자가 writer에서 memberId로 바뀐 것 처럼 출력될 것이다.
+        // System.out.println("작성자 : " + article.writer);
+        // 명령어를 입력해주세요[조재성(aaa)] : list
+        // 번호 : 1
+        // 제목 : 안녕하세요
+        // 작성자 : 1
+        // 등록날짜 : 2021.11.25
+        // 조회수 : 0
+        //     ====================================
+        System.out.println("작성자 : " + article.memberId);
         System.out.println("등록날짜 : " + article.regDate);
         System.out.println("조회수 : " + article.hit);
         System.out.println("===================");
@@ -162,12 +167,17 @@ public class Board {
     private void makeTestData() {
         String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
 
-        articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, "조재성", 0));
-        articles.add(new Article(2, "반갑습니다.", "내용2입니다.", currentDate, "김석영", 0));
-        articles.add(new Article(3, "안녕안녕", "내용3입니다.", currentDate, "조재성", 0));
+        // 8. article이 바뀜에 따라, 테스트add시에도 바뀌어야한다.
+        // -> nickname이나 loginId가 들어가있다면 -> memberId번호로 바꿔주자.
+        // ex> "조재성" -> 1
+        // articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, "조재성", 0));
+        articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, 1, 0));
+        articles.add(new Article(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 0));
+        articles.add(new Article(3, "안녕안녕", "내용3입니다.", currentDate, 1, 0));
 
-        members.add(new Member("aaa", "aaa", "조재성"));
-        members.add(new Member("bbb", "bbb", "김석영"));
+        // 5. 테스트 member 2개가 id 1, 2번을 가져갔다. -> memberNumber가 1+2 -> 3번부터 올라가는 이유.
+        members.add(new Member(1, "aaa", "aaa", "조재성"));
+        members.add(new Member(2, "bbb", "bbb", "김석영"));
 
         loginedMember = members.get(0);
     }
@@ -176,7 +186,7 @@ public class Board {
         System.out.print("검색 키워드를 입력해주세요 : ");
         String keyword = scanner.nextLine();
 
-        ArrayList<Article> searchedArticles = new ArrayList();
+        ArrayList<Article> searchedArticles = new ArrayList<>();
 
         for (int i = 0; i < articles.size(); i++) {
             if (articles.get(i).title.contains(keyword)) {
@@ -216,39 +226,16 @@ public class Board {
         String title = scanner.nextLine();
         System.out.print("내용 : ");
         String body = scanner.nextLine();
-        Article article = new Article(target, title, body, "2021.11.11", "익명", 0);
-        articles.set(targetIndex, article);
-        System.out.println("수정이 완료되었습니다.");
+        // 9. update시 새로운 new Article객체를.. 만들어서 넣어줘야하는데,
+        // -> 진입필터링 이후, 로그인된 상태 보장이 있어야함 -> 일단 주석처리하고 보류한다.
+        // Article article = new Article(target, title, body, "2021.11.11", "익명", 0);
+        //articles.set(targetIndex, article);
 
+        System.out.println("수정이 완료되었습니다.");
         list(articles);
     }
 
     private void addArticle() {
-        //1. 글쓰기가 add다.
-        // -> (로그인)검사통과못하면 코드작동하면안됨 -> 메서드 맨 위에 if return종료필터링
-        // if (loginedMember == null) {
-        //     System.out.println("로그인이 필요한 기능입니다.");
-        //     return;
-        // }
-
-        //2. logout()에 들어있는 코드와 완전 동일하므로 코드중복->메소드로 뺀다.
-        // -> **이 때, <if return>의 종료필터링을 메서드화하려고 하지만,**
-        // -> **메서드의 종료는, 타메서드에서 못하므로 여기와서 해야한다**
-        // --> **즉, <if return 종료필터링 메서드화>는 끽해야 true, false 반환까지만 메서드화 하고, 종료는 여기서 해야한다.**
-        // --> **<if return 종료필터링 메서드화>는 끽해야 true, false 반환까지만 메서드화 하고, 종료는 해당 메서드영역에서 if <받은 true or false>에 의한 return을 여전히 해야한다**
-
-        // isLoginCheck() //-> 3. 일단 종료필터링을 메서드화했지만... true, false를 받아와햔다. -> 4.
-        // 5. if return 종료필터링이 실행될 수 있게, 메서드화시켜 받은 true or false를 받아서 검사한다.
-        // if (isLoginCheck() == false) {
-        //     return;
-        // }
-
-        // 6. run분기 -> 기능 진입 -> isLoginCheck()-> false시 내부 안내문(로긴필요) 후 -> 종료의 패턴을
-        //   run분기 -> isLoginCheck() == true시 -> 기능진입 시켜줘도 된다.
-        //  **진입후 if not -> return 종료필터링**을 -> **진입전 if true시만 -> 진입필터링**으로 바꾸는 것이다.
-        // 즉, **<t/f를 반환하는 메서드로>**가 있다면, **`<진입후 if not return종료필터링>`을 -> true/false가 나오는 상황이라면 `<진입전 if true시만 진입필터링>`으로 바꾸는게 낫다.**
-        // -> 7. run분기로 가서, **<t/f를 반환하는 메서드로>**진입전에 if true시만 진입필터링으로 바꾸자.
-
         System.out.print("제목을 입력해주세요 : ");
         String title = scanner.nextLine();
         System.out.print("내용을 입력해주세요 : ");
@@ -256,24 +243,16 @@ public class Board {
 
         String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
 
-        //10. 이제, isLoginCheck()의 진입시 필터링으로 인해
-        // -> **각 분기메서드 내부는 이제, `무조건 로그인 된 상태`가 된다.**
-        // -> **검사통과한 상태(로그인한 상태)를 활용해서 코드 작성**하자
-        // -> addArticle 등 **이미 로그인된 상태 = loginedMember에 정보 차있는 상태** -> 빼쓰자.
-        // --> 하드코딩"익명"대신, 로그인된 loginedMember객체에서 loginId정보가져와서 작성하기
-        // ---> 보통은 nickname이 중복이 되므로, 글쓴이를 구분하려면 nickname넣으면 안된다.
-        // ---> nickname을 넣고싶다? -> 회원id나 회원고유번호 등도 같이 입력되게 한다.!
-        Article article = new Article(no, title, body, currentDate, loginedMember.loginId, 0);
-
+        //6. add시 Article에 멤버의 nickname, loginId가 아니라 고유번호를 넣도록 수정 -> Article 구조도 변경
+        // -> 여기 수정후, Article class도 수정해주자.
+        // Article article = new Article(articleNumber, title, body, currentDate, loginedMember.loginId, 0);
+        Article article = new Article(articleNumber, title, body, currentDate, loginedMember.id, 0);
         System.out.println("게시물이 저장되었습니다.");
 
         articles.add(article);
-        no++;
+        articleNumber++;
     }
 
-    //4.종료필터링을 옮겨왔지만,
-    // 종료필터링의 return -> 이전메서드의 종료이기 때문에 -> void가 아닌 boolean형으로 true, false여부만 돌려줘야한다.
-    // -> 이전메서드는 t/f를 받아 종료를 결정하도록 짜야한다.
     private boolean isLoginCheck() {
         if (loginedMember == null) {
             System.out.println("로그인이 필요한 기능입니다.");
@@ -305,7 +284,9 @@ public class Board {
             Article article = list.get(i);
             System.out.println("번호 : " + article.id);
             System.out.println("제목 : " + article.title);
-            System.out.println("작성자 : " + article.writer);
+            // System.out.println("작성자 : " + article.writer);
+            //10. 변경
+            System.out.println("작성자 : " + article.memberId);
             System.out.println("등록날짜 : " + article.regDate);
             System.out.println("조회수 : " + article.hit);
             System.out.println("====================================");
