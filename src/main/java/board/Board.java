@@ -41,7 +41,13 @@ public class Board {
                 continue;
             }
             if (command.equals("add")) {
-                addArticle();
+                // 8. 진입후 false 종료필터링을 -> 진입전 true 진입필터링으로 바꿔서 여기로 가져온다.
+                // -> 로그인이 필요한 곳마다 진입전에 체크하도록 한다.
+                // -> **이미 false시에는 로직실행X & (로그인필요)멘트가 나가므로 else처리는 할 필요없다? **
+                // -> **if true 진입필터링은, t/f반환메서드내부에서 false일때, 멘트(진입하려면 로그인 필요 등)를 꼭 날려주자 ->  진입못한 else처리 할 필요가 없어진다.**
+                if (isLoginCheck()==true) {
+                    addArticle();
+                } // false시 멘트 자동으로 나옴. "로그인 필요한 기능입니다"
                 continue;
             }
             if (command.equals("list")) {
@@ -73,9 +79,27 @@ public class Board {
                 login();
                 continue;
             }
+            // 1. 분기문 작성
+            if (command.equals("logout")) {
+                //9. 로그아웃도 로그인검사를 "진입필터링 with 진입못할시 멘트"를 씌워주자.
+                if (isLoginCheck()==true) {
+                    logout();
+                }
+                continue;
+            }
 
             System.out.println("잘못 입력하였습니다.");
         }
+    }
+
+    private void logout() {
+        //3. 중복코드 함수화 됨.
+        // if (loginedMember == null) {
+        //     System.out.println("로그인이 필요한 기능입니다.");
+        //     return;
+        // }
+        loginedMember = null;
+        System.out.println("로그아웃 되셨습니다.");
     }
 
     private void login() {
@@ -136,26 +160,15 @@ public class Board {
     }
 
     private void makeTestData() {
-        // 2. 게시글 작성자를 "익명" -> 특정회원으로 바꿔주자..?!
-        // + 함수를 인자에서 호출하지말고, 변수로 빼서 최적화시켜주자.
-        // -> test
-        // 명령어를 입력해주세요 : login
-        // 아이디 : aaa
-        // 비밀번호 : aaa
-        // 조재성님 안녕하세요.!
-        // 명령어를 입력해주세요[조재성(aaa)] :
         String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
 
         articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, "조재성", 0));
         articles.add(new Article(2, "반갑습니다.", "내용2입니다.", currentDate, "김석영", 0));
         articles.add(new Article(3, "안녕안녕", "내용3입니다.", currentDate, "조재성", 0));
 
-        // 1. 이 것은 run메서드()가 실행되기 직전, run메서드()실행을 위한 객체 생성시 생성자에서 작동한다.
         members.add(new Member("aaa", "aaa", "조재성"));
         members.add(new Member("bbb", "bbb", "김석영"));
 
-        // 3. 로그인 하는 것도 귀찮으니 `메서드 기능구현용객체. 생성자.`에서 초기데이터 넣어주던 메소드(makeTestData)에
-        // -> `loginedMember = `를 초기 데이터에서 1개 꺼내 넣어주기
         loginedMember = members.get(0);
     }
 
@@ -211,6 +224,31 @@ public class Board {
     }
 
     private void addArticle() {
+        //1. 글쓰기가 add다.
+        // -> (로그인)검사통과못하면 코드작동하면안됨 -> 메서드 맨 위에 if return종료필터링
+        // if (loginedMember == null) {
+        //     System.out.println("로그인이 필요한 기능입니다.");
+        //     return;
+        // }
+
+        //2. logout()에 들어있는 코드와 완전 동일하므로 코드중복->메소드로 뺀다.
+        // -> **이 때, <if return>의 종료필터링을 메서드화하려고 하지만,**
+        // -> **메서드의 종료는, 타메서드에서 못하므로 여기와서 해야한다**
+        // --> **즉, <if return 종료필터링 메서드화>는 끽해야 true, false 반환까지만 메서드화 하고, 종료는 여기서 해야한다.**
+        // --> **<if return 종료필터링 메서드화>는 끽해야 true, false 반환까지만 메서드화 하고, 종료는 해당 메서드영역에서 if <받은 true or false>에 의한 return을 여전히 해야한다**
+
+        // isLoginCheck() //-> 3. 일단 종료필터링을 메서드화했지만... true, false를 받아와햔다. -> 4.
+        // 5. if return 종료필터링이 실행될 수 있게, 메서드화시켜 받은 true or false를 받아서 검사한다.
+        // if (isLoginCheck() == false) {
+        //     return;
+        // }
+
+        // 6. run분기 -> 기능 진입 -> isLoginCheck()-> false시 내부 안내문(로긴필요) 후 -> 종료의 패턴을
+        //   run분기 -> isLoginCheck() == true시 -> 기능진입 시켜줘도 된다.
+        //  **진입후 if not -> return 종료필터링**을 -> **진입전 if true시만 -> 진입필터링**으로 바꾸는 것이다.
+        // 즉, **<t/f를 반환하는 메서드로>**가 있다면, **`<진입후 if not return종료필터링>`을 -> true/false가 나오는 상황이라면 `<진입전 if true시만 진입필터링>`으로 바꾸는게 낫다.**
+        // -> 7. run분기로 가서, **<t/f를 반환하는 메서드로>**진입전에 if true시만 진입필터링으로 바꾸자.
+
         System.out.print("제목을 입력해주세요 : ");
         String title = scanner.nextLine();
         System.out.print("내용을 입력해주세요 : ");
@@ -218,11 +256,30 @@ public class Board {
 
         String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
 
-        Article article = new Article(no, title, body, currentDate, "익명", 0);
+        //10. 이제, isLoginCheck()의 진입시 필터링으로 인해
+        // -> **각 분기메서드 내부는 이제, `무조건 로그인 된 상태`가 된다.**
+        // -> **검사통과한 상태(로그인한 상태)를 활용해서 코드 작성**하자
+        // -> addArticle 등 **이미 로그인된 상태 = loginedMember에 정보 차있는 상태** -> 빼쓰자.
+        // --> 하드코딩"익명"대신, 로그인된 loginedMember객체에서 loginId정보가져와서 작성하기
+        // ---> 보통은 nickname이 중복이 되므로, 글쓴이를 구분하려면 nickname넣으면 안된다.
+        // ---> nickname을 넣고싶다? -> 회원id나 회원고유번호 등도 같이 입력되게 한다.!
+        Article article = new Article(no, title, body, currentDate, loginedMember.loginId, 0);
+
         System.out.println("게시물이 저장되었습니다.");
 
         articles.add(article);
         no++;
+    }
+
+    //4.종료필터링을 옮겨왔지만,
+    // 종료필터링의 return -> 이전메서드의 종료이기 때문에 -> void가 아닌 boolean형으로 true, false여부만 돌려줘야한다.
+    // -> 이전메서드는 t/f를 받아 종료를 결정하도록 짜야한다.
+    private boolean isLoginCheck() {
+        if (loginedMember == null) {
+            System.out.println("로그인이 필요한 기능입니다.");
+            return false;
+        }
+        return true;
     }
 
     private void printHelp() {
