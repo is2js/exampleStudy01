@@ -132,10 +132,19 @@
 
     5. (추가) Member 데이터도 식별번호 추가 like 게시물 -> 게시물 쓸 때, member의 nickname, loginId보다는 고유번호id를 삽입하도록 변경
        1. loginId로 중복을 방지할 수 있지만, **수월하게 데이터를 관리하려면 1부터 1씩 증가하는 변수가 있는 것이 좋다**
-       2. add시 Article에 멤버의 nickname, loginId가 아니라 고유번호를 넣도록 수정 -> Article 구조도 변경  
+       2. add시 Article에 멤버의 nickname, loginId가 아니라 고유번호를 넣도록 수정 -> Article 구조도 변경
+    6. (추가2) Article nickname 데이터(변수) 추가: (고정된 값X)default "" -> `조회시 (변경하는, 변경된 데이터가 위치하는)member`를 통해 채워지도록 
+       1. 게시물검색시 index반환 -> 게시물검색시 nickname까지 완성된 게시물반환 (index찾아오는 것은 없어짐)
+          1. 게시물번호(input) -> 게시물검색 -> 찾아으면 받아놓고 memberId로 member정보(nickname)도 받기 -> 게시물완성후 게시물객체 반환
+       2. memberId와 마찬가지로 **nickname**도 Article의 데이터로 포함시키기
+          1. **nickname은 article에 빈값`""`으로 비워놓고, `해당 게시물 조회`(검색하는 read, search, update)`시 자동으로 코드가 삽입`하게 해준다.**
+       3. **nickname은 어차피 member를 통한 조회후 출력만 되면 된다. `add시 필요없으므로, 인변으로 가지고 있되, 생셩자에서는 뺀다.`**
+          1. 생성자에 가지고 있으면, 매번 글쓸때마다 `""`빈 문자열을 넣어야한다..
+          2. **add시 default값이고, 조회시 매번 받아와야함.**
 ## 기능 목록
 - add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test 회원 data 자동 생성 및 로그인시켜놓기 
-- logout -> login필요기능들 처리 -> member 식별번호 추가 ->  
+- logout -> login필요기능들 처리 -> member 식별번호 추가 ->  검색을 index->Article객체로 반환하도록 수정 + nickname변수를 Article에 추가하되, 생성자에선X -> Add시 노필요 default값만 유지하다가 조회시 Member에서 항상 최신값 받아오기
+- 
 
 ## 기능 요구 사항
 - 
