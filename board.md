@@ -116,8 +116,12 @@
        3. 테스트 데이터라도, 인자에 객체 생성 or 함수바로 호출 하지말고, 변수로 빼서 최적화시켜주기
     3. **signup(add) 뿐만 아니라 로그인 하는 것도 귀찮으니 `메서드 기능구현용객체. 생성자.`에서 초기데이터 넣어주던 메소드(makeTestData)에 `loginedMember = `를 초기 데이터에서 1개 꺼내 넣어주기**
 
+
+12. 
+
 ## 기능 목록
-- add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test data 
+- add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test 회원 data 자동 생성 및 로그인시켜놓기 
+- logout -> 
 
 ## 기능 요구 사항
 - 요구사항 - 회원 테스트 데이터 작성
