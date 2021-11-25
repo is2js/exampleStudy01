@@ -3,6 +3,7 @@ package board;
 import board.util.MyUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class Board {
@@ -10,9 +11,16 @@ public class Board {
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
     ArrayList<Member> members = new ArrayList<>();
+    //13.
+    ArrayList<Reply> replies = new ArrayList<>();
     int articleNumber = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
     int memberNumber = 1 + 2; // 회원 고유번호
+    //10. id는 run메소드() 시작시부터 관리되도록 인스턴스변수로 1부터 시작시킨다~
+    int replyNumber = 1; // 댓글 고유번호
     Member loginedMember = null;
+    // 7. 유틸메소드의 default인자를 변수로 미리 선언해놓기 + (내생각엔 format파라미터로 받앗는데 너무 하드코딩반복 -> default값으로서 변수로 ->
+    // -> 바뀌면 바꿔서 넣으면 됨.)
+    String dateFormat = "yyyy.MM.dd";
 
     public Board() {
         makeTestData();
@@ -124,7 +132,7 @@ public class Board {
         Member member = new Member(memberNumber, loginId, loginPw, nickname);
         members.add(member);
         System.out.println("회원가입이 완료되었습니다.");
-        memberNumber++; //
+        memberNumber++;
     }
 
     private void readArticles() {
@@ -147,50 +155,20 @@ public class Board {
         System.out.println("조회수 : " + article.hit);
         System.out.println("===================");
 
-        //4. **길어지면서 & 먼가 성격이 조금 바뀌고, 계층이 달라진다면 -> method로 빼주자.**
-        // -> 작성하다가, 길어지면 메뉴+입력대기 시작부터 싹다 잘라내서 메소드로뺀다.
         readProcess();
-
-        // // 1. 상세보기는, 다 끝난 뒤, 영역끝 -> 함수끝나기 전에 한번더 물어보면서 입력을 받아줘야한다.
-        // // - 대기는 입력받는 것으로 인해 생기니까 **함수끝나기전 안내문+대기** 걸어줘야 메뉴가 생긴다.
-        // System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
-        // //2. only 문자열 숫자만 들어온다고 가정하면, 바로 파싱한다.
-        // int readCommand = Integer.parseInt(scanner.nextLine());
-        // //3. 각 메뉴는 분기를 해줘야한다.
-        // // -> 각 분기는 print로만 채워둔다.
-        // if (readCommand == 1) {
-        //     System.out.println("[댓글 기능]");
-        // }
-        // if (readCommand == 2) {
-        //     System.out.println("[좋아요 기능]");
-        // }
-        // if (readCommand == 5) {
-        //     // 종료
-        // }
     }
 
-    //5. 메소드로 1,2,5 3개분기만 뺀 상태에서 테스트해보자.
     private void readProcess() {
-        //6. 메뉴+진입 -> 테스트가 완료되었을 때 -> while문에서 무한반복으로 계속 띄워주게 하자.
-        // System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
-        // int readCommand = Integer.parseInt(scanner.nextLine());
-        // if (readCommand == 1) {
-        //     System.out.println("[댓글 기능]");
-        // }
-        // if (readCommand == 2) {
-        //     System.out.println("[좋아요 기능]");
-        // }
-        // if (readCommand == 5) {
-        // }
-        //7. whlie true로 시작 -> 5번 분기가 탈출조건으로 있으니까 break를 걸어준다. 그외 분기는 coninue
         while (true) {
             System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
             int readCommand = Integer.parseInt(scanner.nextLine());
             if (readCommand == 5) {
-                break; // 무한반복시 먼저 해줘야할 break; 조건절이 분기중 1개임.
+                break;
             }
             if (readCommand == 1) {
-                System.out.println("[댓글 기능]");
+                // 1. 댓글등록 [기능] -> [메소드]로 따로 빼면서 구현한다.
+                // System.out.println("[댓글 기능]");
+                reply();
                 continue;
             }
             if (readCommand == 2) {
@@ -200,9 +178,51 @@ public class Board {
         }
     }
 
+    private void reply() {
+        // 2. 입력부터 안내문과 함께 요구한다. -> 입출력부터 완성한다. -> 그담이 기능
+        System.out.print("댓글 내용을 입력해주세요 : ");
+        String rbody = scanner.nextLine(); // 댓글내용 : reply body
+        // 3. 기능으로서 받은 댓글을 저장해야한다.
+        // -> db대신  arraylist를 또 생성해야함.
+        // -> **Article(게시물)에 댓글 저장한다는 생각을 버려라.**
+        // -> 1개 Article당 여러개의 댓글이 달리므로. 따로 저장하는데, 연관성을 나타내는 변수를 One to Many에게 Fk를 줘야함.
+        // -> **댓글이 rbody만 받았다고 해서 1개의 데이터로 이루어진게 아니다!**
+        // -> 출력할 때 보면, 번호, 작성자,내용, 작성일, 등 여러정보가 있다. (최소3개)
+        // -> 등록할 데이터를 위해 Reply 데이터 생성한다. -> 4.
+
+        // 6. Reply를 등록하면 4개의 데이터필요 -> rbody 1개밖에 안받음.
+        // -> 나머지 3개를 구해오자.
+        // 6-1) memberId는 -> 로그인된 정보에서 가져온다.
+        int memberId = loginedMember.id;
+        // 6-2) regDate는? -> MyUtil의 공유목적의 유틸메소드를 활용한다.
+        // -> 파라미터로 포맷을 주는데, **이참에 메소드에 default포맷을 넣어주자.**
+        // -> **python과 달리, 파라미터의 default값의 메소드선언부가 아닌, 사용처에서 변수로 생성한다.
+        // -> my) 파라미터로 계속 반복해서 들어가니 , 값의 반복 -> 변수(절대 안변하면 상수)로 빼주는 방식을 이용하는 개념도 포함된듯?
+        // -> 7. String dateFormat =
+        // 8.
+        // String regDate = MyUtil.getCurrentDate("yyyyMMdd");
+        // -> 이제 getCurrentDate() 사용된 곳 찾아가서 다  "하드코딩" -> 변수 처리해주자.
+        // -> ctrl+f -> f3으로 하나씩 찾아가기 or F12 2번씩 눌러서 하나하나 방문하기
+        String regDate = MyUtil.getCurrentDate(dateFormat);
+
+        // 9.( 6-3)변수 )마지막 댓글의 id도, 자동으로 1씩 증가하도록 1시작 -> add마다 ++1; 되도록 [변수]관리해주자.
+        // -> addArticle때 처럼 1개 마련해놓고 add마다 1씩 증가시키기
+
+        //11. 이제  파편의 데이터들 4개를 new Reply에 묶어서 저장하고, -> 댓글id+1 해준다.
+        // new Reply(replyNumber, rbody, memberId, regDate);
+        Reply reply = new Reply(replyNumber, rbody, memberId, regDate);
+        //12. 댓글db를 만들어서 add해준다.
+        replies.add(reply);
+        //14. 테스트
+        replyNumber++;
+        System.out.println("댓글이 등록되었습니다.");
+        //15. 정말 댓글이 등록되었는지 알기 위해, 댓글이 추가된 상세화면을 출력하라고 요구사항에 적혀있다.
+        // -> 다음에 구현
+    }
+
     private void makeTestData() {
-        String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
-        articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, 1,  0));
+        String currentDate = MyUtil.getCurrentDate(dateFormat); // 이참에 default 파라미터를 사용해준다.
+        articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, 1, 0));
         articles.add(new Article(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 0));
         articles.add(new Article(3, "안녕안녕", "내용3입니다.", currentDate, 1, 0));
 
@@ -269,7 +289,7 @@ public class Board {
         System.out.print("내용을 입력해주세요 : ");
         String body = scanner.nextLine();
 
-        String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
+        String currentDate = MyUtil.getCurrentDate(dateFormat);
         Article article = new Article(articleNumber, title, body, currentDate, loginedMember.id, 0);
         System.out.println("게시물이 저장되었습니다.");
 
@@ -303,7 +323,7 @@ public class Board {
             }
         }
 
-        if ( targetArticle != null ) {
+        if (targetArticle != null) {
             Member writer = getMemberByMemberId(targetArticle.memberId);
             targetArticle.nickname = writer.nickname;
         }
@@ -331,7 +351,6 @@ public class Board {
             System.out.println("등록날짜 : " + article.regDate);
             System.out.println("조회수 : " + article.hit);
             System.out.println("====================================");
-
         }
     }
 }
