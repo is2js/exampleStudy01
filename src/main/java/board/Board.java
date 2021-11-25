@@ -10,10 +10,8 @@ public class Board {
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
     ArrayList<Member> members = new ArrayList<>();
-    int no = 1 + 3; // 게시물고유번호 + Test데이터 3개 들어감.
-    //1. 로그인 성공회원을 login() { } 속 -> 검색반복문 { } 안에서 찾았다면,
-    // -> 사라지기전에, 객체단위 실행 runBoard() 내내 살아있을 수 있도록, <로그아웃전까지> 객체의 데이터인 인스턴스변수에 담아두자!
-    Member loginedMember = null; // 자바에서는 객체type(Class type)은 기본 null이 들어감. (가시성을 위해 일단 넣어줌)
+    int no = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
+    Member loginedMember = null;
 
     public Board() {
         makeTestData();
@@ -21,11 +19,15 @@ public class Board {
 
     public void runBoard() {
         while (true) {
-            // 2. 로그인했다면 -> 보이는 [run()메소드 대표 안내문]이 <분기에 따라> 달라진다.
             if (loginedMember == null) {
                 System.out.print("명령어를 입력해주세요 : ");
             } else {
-                System.out.print("명령어를 입력해주세요[" + loginedMember.nickname + "(" + loginedMember.loginId + ")] : ");
+                System.out.print(
+                        "명령어를 입력해주세요["
+                                + loginedMember.nickname
+                                + "("
+                                + loginedMember.loginId
+                                + ")] : ");
             }
             String command = scanner.nextLine();
 
@@ -88,7 +90,6 @@ public class Board {
             if (member.loginId.equals(loginId) && member.loginPw.equals(loginPw)) {
                 isExistLoginId = true;
                 System.out.println(member.nickname + "님 안녕하세요.!");
-                //2. 사라직전에, 찾은 member를 객체단우 관리변수에 넣어두자.
                 loginedMember = member;
                 break;
             }
@@ -135,12 +136,27 @@ public class Board {
     }
 
     private void makeTestData() {
-        articles.add(
-                new Article(1, "안녕하세요", "내용1입니다.", MyUtil.getCurrentDate("yyyy.MM.dd"), "익명", 0));
-        articles.add(
-                new Article(2, "반갑습니다.", "내용2입니다.", MyUtil.getCurrentDate("yyyy.MM.dd"), "익명", 0));
-        articles.add(
-                new Article(3, "안녕안녕", "내용3입니다.", MyUtil.getCurrentDate("yyyy.MM.dd"), "익명", 0));
+        // 2. 게시글 작성자를 "익명" -> 특정회원으로 바꿔주자..?!
+        // + 함수를 인자에서 호출하지말고, 변수로 빼서 최적화시켜주자.
+        // -> test
+        // 명령어를 입력해주세요 : login
+        // 아이디 : aaa
+        // 비밀번호 : aaa
+        // 조재성님 안녕하세요.!
+        // 명령어를 입력해주세요[조재성(aaa)] :
+        String currentDate = MyUtil.getCurrentDate("yyyy.MM.dd");
+
+        articles.add(new Article(1, "안녕하세요", "내용1입니다.", currentDate, "조재성", 0));
+        articles.add(new Article(2, "반갑습니다.", "내용2입니다.", currentDate, "김석영", 0));
+        articles.add(new Article(3, "안녕안녕", "내용3입니다.", currentDate, "조재성", 0));
+
+        // 1. 이 것은 run메서드()가 실행되기 직전, run메서드()실행을 위한 객체 생성시 생성자에서 작동한다.
+        members.add(new Member("aaa", "aaa", "조재성"));
+        members.add(new Member("bbb", "bbb", "김석영"));
+
+        // 3. 로그인 하는 것도 귀찮으니 `메서드 기능구현용객체. 생성자.`에서 초기데이터 넣어주던 메소드(makeTestData)에
+        // -> `loginedMember = `를 초기 데이터에서 1개 꺼내 넣어주기
+        loginedMember = members.get(0);
     }
 
     private void searchArticles() {
