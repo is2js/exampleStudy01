@@ -5,7 +5,7 @@ import board.util.MyUtil;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Board {
+public class Board extends Main {
 
     Scanner scanner = new Scanner(System.in);
     ArrayList<Article> articles = new ArrayList<>();
@@ -157,8 +157,6 @@ public class Board {
         System.out.println("===================");
         System.out.println("======= 댓글 ======");
         for (Reply currentReply : replies) {
-            // 4. 이제 모든 댓글이 아니라, reply속 fk(부모글번호)로 many들 중 일부만 추려서 출력할 수 있게 된다.
-            // -> test
             if (currentReply.parentId == article.id) {
                 currentReply = setReplyNickName(currentReply);
                 System.out.println("내용 : " + currentReply.body);
@@ -199,10 +197,6 @@ public class Board {
         String rbody = scanner.nextLine();
         int memberId = loginedMember.id;
         String regDate = MyUtil.getCurrentDate(dateFormat);
-        //3. reply()는 상세보기하고 있는 article을 파라미터로 받았었다. -> article은 부모글 -> id를 꺼내서 reply객체에 넣어준다.
-        // Reply reply = new Reply(replyNumber, rbody, memberId, regDate);
-        // -> 각 reply마다 부모글번호가 입력됬으니, 상세보기시 -> 부모글번호에 해당하는 reply들만 뿌려줄 수 있다.
-        // -> 출력시 많은many중 해당하는 것들만 추리기 위해 fk(부모글의 id)를 활용하자. -> 4.
         Reply reply = new Reply(replyNumber, article.id,rbody, memberId, regDate);
         replies.add(reply);
         replyNumber++;

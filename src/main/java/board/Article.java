@@ -1,6 +1,6 @@
 package board;
 
-public class Article {
+public class Article extends Board {
     int id;
     String title;
     String body;
