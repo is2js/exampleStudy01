@@ -139,25 +139,8 @@ public class Board {
             return;
         }
         article.hit++;
-        // 2. 이 아래로 코드를 복사해서 써야한다? -> 복사is중복이니
-        // -> 이 아래로 메소드화시켜서 메소드자체를 가져간다.
-        // -> 리팩토링 단축키(alt+ctrl+m 2번) 활용하기
-        // --> **특정필드(id, number)등이 필요하면 ById, ByNumber를 메소드이름에 단다. 그게 아니면  동사+명사로**
-        // System.out.printf("==== %d번 게시물 ====\n", article.id);
-        // System.out.println("번호 : " + article.id);
-        // System.out.println("제목 : " + article.title);
-        // System.out.println("-------------------");
-        // System.out.println("내용 : " + article.body);
-        // System.out.println("-------------------");
-        // System.out.println("작성자 : " + article.nickname);
-        // System.out.println("등록날짜 : " + article.regDate);
-        // System.out.println("조회수 : " + article.hit);
-        // System.out.println("===================");
         printArticle(article);
 
-        //6. printArticle -> reply -> readProcess -> readArticles까지 거슬러 올라와서
-        // -> printArticle()에 필요한 인자인 상세보기 대상 article을 파라미터로 순차적으로 넘겨준다.
-        //readProcess();
         readProcess(article);
     }
 
@@ -172,53 +155,27 @@ public class Board {
         System.out.println("등록날짜 : " + article.regDate);
         System.out.println("조회수 : " + article.hit);
         System.out.println("===================");
-        //11. 댓글출력을 따로 할려고 하지말고, 상세글보기에 이어서 출력되게 붙혀준다.
         System.out.println("======= 댓글 ======");
-        // 12. 댓글을 출력하려면, replies에서 반복문으로 싹 꺼내오면서 출력하면 된다. for문이라 없으면 안돈다.
-        // -> iter로 향상된 for문이라도, 변수명은 reply -> currentreply 쓰려고 애써보자.
-        // -> **일단 구현을 위해서, 각 게시글 번호에 맞는 댓글이 아니라, 모든 댓글이 뿌려지도록 한다.**
-        // --> 나중에 가보면 알겠지만, 1번 게시물에서 등록한 댓글이, read 2번글 상세보기에서도 다보임.
         for (Reply currentReply : replies) {
-            //15. 이제 memberId로 nickname을 받아와서 넣어주는 코드를 짜자.
-            // -> 현재의 reply에 대해, reply객체를 통째로 받아서 -> memberId로 조회한 최신 nickname을 reply.nickname을 채워준다.(생성자에선 안햇었음!)
-            // -> reply.memberId만 넘기지말고 객체를 통째로 넘겨줫다가, nickname이 채워진 객체를 통째로 받자!
-            // -> article의 경우, article객체검색로직 -> nickname채우는 로직 -> 완성된 aritcle객체 반환이었지만
-            // -> reply는 검색X 반환X -> 바로 출력하기 때문에 -> 출력직전에 nickname을 채워, 완성된 nickname이 출력되게 한다.
-            currentReply = setReplyNickName(currentReply); //->  16. 메서드 작성하고 오기
-
-            System.out.println("내용 : " + currentReply.body);
-            //13. reply든, article이든, nickname대신 memberId를 가지고 있다가 -> 중복/변경가능한 nickname을 매번 조회해서 가져온다.
-            // System.out.println("작성자 : " + reply.memberId);
-            // -> 생성자에는 없어도, 필드로는 nickname을 가지고 있어서, 거기에 받아주는 형태를 취하자..
-            // -> Reply에 nickname필드추가하기. -> 14.
-            System.out.println("작성일 : " + currentReply.regDate);
-            System.out.println("==================="); // 댓글끝날때마다 줄 계속 넣어주기
+            // 4. 이제 모든 댓글이 아니라, reply속 fk(부모글번호)로 many들 중 일부만 추려서 출력할 수 있게 된다.
+            // -> test
+            if (currentReply.parentId == article.id) {
+                currentReply = setReplyNickName(currentReply);
+                System.out.println("내용 : " + currentReply.body);
+                System.out.println("작성일 : " + currentReply.regDate);
+                System.out.println("===================");
+            }
         }
-
     }
 
     private Reply setReplyNickName(Reply currentReply) {
-        // 16. article시 작성했던 코드를 활용한다.
-        // -> target article검색 직후 -> target article에 nickname을 채워주기 위한 코드였다.
-        // -> 마찬가지로 **들어온 reply객체가 null이 아닐때만, 필드접근하여 reply.memberId-> reply.nickname 채우도록 해준다.**
-        // -> 이 부분을..Article도,, 메소드화 시켜서, setArticleNickname해줘야할듯..
-
-        // if (targetArticle != null) {
-        //     Member writer = getMemberByMemberId(targetArticle.memberId);
-        //     targetArticle.nickname = writer.nickname;
-        // }
-        // return targetArticle;
         if (currentReply != null) {
             Member writer = getMemberByMemberId(currentReply.memberId);
             currentReply.nickname = writer.nickname;
         }
-        // return null;
-        // 17. reply가 null이 들어왔음..자동으로 로직없이 종료되면 reply 그대로 반환 -> null이 반환된다.
-        return currentReply; // 리팩토링 되겟지만, article에서 객체에 nickname박는 로직도 함수화해주자. -> 18.
+        return currentReply;
     }
 
-    //7. 파라미터 받기
-    // private void readProcess() {
     private void readProcess(Article article) {
         while (true) {
             System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
@@ -227,10 +184,6 @@ public class Board {
                 break;
             }
             if (readCommand == 1) {
-                // 4. reply()를 호출하는 readProcess()에도, 게시물 정보는 없다.
-                // -> readProcess()를 호출하는 곳으로 가서, **물 흐르듯이 넘기면된다.** -> 5.
-                //8. 파라미터 받기
-                // reply();
                 reply(article);
                 continue;
             }
@@ -241,30 +194,21 @@ public class Board {
         }
     }
 
-    //9. 파라미터 받기
-    // private void reply() {
     private void reply(Article article) {
         System.out.print("댓글 내용을 입력해주세요 : ");
         String rbody = scanner.nextLine();
         int memberId = loginedMember.id;
         String regDate = MyUtil.getCurrentDate(dateFormat);
-
-        Reply reply = new Reply(replyNumber, rbody, memberId, regDate);
+        //3. reply()는 상세보기하고 있는 article을 파라미터로 받았었다. -> article은 부모글 -> id를 꺼내서 reply객체에 넣어준다.
+        // Reply reply = new Reply(replyNumber, rbody, memberId, regDate);
+        // -> 각 reply마다 부모글번호가 입력됬으니, 상세보기시 -> 부모글번호에 해당하는 reply들만 뿌려줄 수 있다.
+        // -> 출력시 많은many중 해당하는 것들만 추리기 위해 fk(부모글의 id)를 활용하자. -> 4.
+        Reply reply = new Reply(replyNumber, article.id,rbody, memberId, regDate);
         replies.add(reply);
         replyNumber++;
         System.out.println("댓글이 등록되었습니다.");
 
-        // 1. 댓글이 등록된 뒤 바로, 상세보기(readArticles) 중 출력해주는 부분만 다시 보여주기
-        // readArticles() 전체가 아니라 출력부분만 필요함. -> 코드복사 -> 메소드화 해서 가져올 생각.
-
-        // 3. 상세보기(readArticles())중 article객체받아 출력부분만 메소드화 시킨 것을 가져와 사용
-        // -> 근데 파라미터로 들어갈 article객체가 없는 상황이다.
-        // printArticle(article); // 에러
-        // -> 지금까지 Article은 (index->)게시물번호로 찾았었다. 근데, reply()안에서는 번호도 없다.
-        // --> **reply()를 호출하는 곳으로가서, 넘겨받도록 수정해야한다.** -> 4.
-        //10. 최종적으로 파라미터를 받아왔다.
         printArticle(article);
-
     }
 
     private void makeTestData() {
@@ -370,9 +314,6 @@ public class Board {
             }
         }
 
-        // 18.
-        // - 조건에 맞는 객체를 반환하는 순간에, [객체 검색로직] 직후 -> [nickname박는 로직]도 같이 넣어줘야 완성된 객체가 반환된다.
-        // -> reply에서 해준 것처럼(setReplyNickName) article로 닉네임 박는 로직을 메소드화
         targetArticle = setArticleNickname(targetArticle);
         return targetArticle;
     }

@@ -180,10 +180,17 @@
              1. `article`의 경우, article객체검색로직 -> nickname채우는 로직 -> 완성된 aritcle객체 반환이었지만
              2. `reply`는 검색X 반환X -> 바로 출력하기 때문에 -> 출력직전에 nickname을 채워, 완성된 nickname이 출력되게 한다.
        8. **`if not null`에만 로직 작동 + `if문 바깥에서만 return` 하는 로직의 메소드 -> 파라미터가 null이면, 로직안거치고 바로 return null이 된다.**
+    8. (추가)댓글구현3- Reply에 부모글번호도 보유 -> (특정)글에 대한 상세보기시 (해당)댓글만 보이게하기
+       1. 댓글은 부모글이 반드시 필요하다. 모든 댓글 구현시만 잠시 빼놓은 것.
+       2. **one의 번호를 fk로 받아야, `수많은 many 속에서` 해당하는 `1개 one에 대한 것들만 추릴` 수 있다.**
+          1. fk(부모, 상위카테고리, one의 번호)를 받는 목적은 **many속에서도 일부만 추릴려고**
+       3. **many속 `fk의 2가지 용도`를 깨달음..**
+          1. **my) Reply속 memberId -> `정보조회용fk`** 
+          2. **parentId -> `many(나)들 중 부모에 해당하는 것 일부만 추리는` 용도**
 ## 기능 목록
 - add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test 회원 data 자동 생성 및 로그인시켜놓기 
 - logout -> login필요기능들 처리 -> member 식별번호 추가 ->  검색을 index->Article객체로 반환하도록 수정 + nickname변수를 Article에 추가하되, 생성자에선X -> Add시 노필요 default값만 유지하다가 조회시 Member에서 항상 최신값 받아오기
-- read(상세보기) 하위메뉴 -> 댓글 등록(add, 부모글정보X) 
+- read(상세보기) 하위메뉴 -> 댓글 등록(add, 부모글정보X) -> (부모글정보X, 모든) 댓글 목록 -> Reply에 부모글번호도 보유 -> (특정)글에 대한 상세보기시 (해당)댓글만 보이게하기
 
 ## 기능 요구 사항
 - 상요구사항 - 댓글 기능 추가
