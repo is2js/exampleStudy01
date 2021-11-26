@@ -11,6 +11,8 @@ public class Board extends Main {
     ArrayList<BoardArticle> boardArticles = new ArrayList<>();
     ArrayList<Member> members = new ArrayList<>();
     ArrayList<ReplyArticle> replies = new ArrayList<>();
+    //4. 라이크를 저장할 arraylist 만들기
+    ArrayList<Like> likes = new ArrayList<>();
     int boardArticleNumber = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
     int memberNumber = 1 + 2; // 회원 고유번호
     int replyArticleNumber = 1; // 댓글 고유번호
@@ -107,19 +109,6 @@ public class Board extends Main {
 
             if (member.loginId.equals(loginId) && member.loginPw.equals(loginPw)) {
                 isExistLoginId = true;
-                // 2. instanceof 로 하카객체별 다르게 분기 -> 직접처리  했던 부분을 주석처리한다.
-                // if (member instanceof GeneralMember) {
-                //     GeneralMember generalMember = (GeneralMember)member;
-                //     System.out.println("안녕하세요 일반회원" +generalMember.nickname + "님 반갑습니다.");
-                // }
-                // if (member instanceof SpecialMember) {
-                //     SpecialMember specialMember = (SpecialMember)member;
-                //     System.out.println("안녕하세요 우수회원" + specialMember.nickname + "님 사랑합니다.! 회원님의 남은 포인트는 현재 "+ specialMember.point+ "입니다.");
-                // }
-
-                // 3. 다형성으로 하카객체 섞어놓은 list에서 꺼낸, 상카객체(하카의 어느것인지 모름)에게 바로 공통기능을 호출하도록 한다.
-                // -> TEST해도, 아직 하카별 공통기능의 수정사용(오버라이딩) 안했기 때문에,  하카별 구분이 없이 상카공통기능만 작동한다.
-                // -> 작업용의성을 위해, 초기 테스트 데이터 1명을 우수해원으로 변경하자.
                 member.greeting();
 
                 loginedMember = member;
@@ -142,9 +131,6 @@ public class Board extends Main {
         String loginPw = scanner.nextLine();
         System.out.print("닉네임을 입력해주세요 : ");
         String nickname = scanner.nextLine();
-        // 8. 회원종류에 따라 다른 (하위카테고리class 중 택1) 객체를 만들어서 받아줘야한다.
-        // Member member = new Member(memberNumber, loginId, loginPw, nickname);
-        // -> **분기에 따라 new하카객체 생성시, [분기별 변수에 받는 것은 분기 맨 위에 상카객체Type 변수]로 다형성으로 편하게 받아준다!!**
         Member member = null;
         if (memberFlag == 2) {
             member = new SpecialMember(memberNumber, loginId, loginPw, nickname, 0);
@@ -152,8 +138,6 @@ public class Board extends Main {
         if (memberFlag == 1) {
             member = new GeneralMember(memberNumber, loginId, loginPw, nickname);
         }
-        // 9. 기존list라도, 상카classType의 list이므로, 하카Class객체를 다형성으로 편하게 받을 수 있다.
-        // -> 꺼내기 전까진, 어떤회원이 우수회원이고, 어떤회원이 우수회원인지 모른다.
         members.add(member);
 
         System.out.println("회원가입이 완료되었습니다.");
@@ -208,7 +192,21 @@ public class Board extends Main {
                 continue;
             }
             if (readCommand == 2) {
-                System.out.println("[좋아요 기능]");
+                //2. 객체생성에 필요한 3가지 정보를 얻어내보자.
+                // 1) articleId -> 상세보기진입(readProcess)시 받아온 boardArticle에서 꺼내자.
+                // 2) memberId -> 로그인된 사람의 정보를 꺼내자.
+                // 3) 등록날짜 -> 유틸메소드로 채우자.
+                // new Like(boardArticle.id, loginedMember.id, MyUtil.getCurrentDate(dateFormat))
+
+                //3. 생성된 좋아요는, 콘솔 상 -> 여러 로그인회원에 의해서, 글1개당 여러좋아요가 생성될 것이다.
+                // -> 여러개니까 arraylist를 db로 삼고 저장한다.
+                Like like = new Like(boardArticle.id, loginedMember.id, MyUtil.getCurrentDate(dateFormat));
+                //5. likes(db, arraylist)에 저장(add)하기
+                likes.add(like);
+                //6. 저장후  [로직이 다끝났을때는 멘트]를 날린다. -> test
+                // -> Test해보면, 내가 좋아요한 게시물인데, 좋아요해제를 안하고 게속 좋아요하면서 저장만 한다.
+                // -> 해제가 필요하다.
+                System.out.println("해당 게시물을 좋아합니다.");
                 continue;
             }
         }
@@ -234,8 +232,6 @@ public class Board extends Main {
         boardArticles.add(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 0));
         boardArticles.add(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 0));
         members.add(new GeneralMember(1, "aaa", "aaa", "조재성"));
-        //4. 작업용의성을 위해, 초기 테스트 데이터 1명을 우수회원으로 변경하자.
-        // members.add(new GeneralMember(2, "bbb", "bbb", "김석영"));
         members.add(new SpecialMember(2, "bbb", "bbb", "김석영", 0));
 
         loginedMember = members.get(0);

@@ -7,7 +7,6 @@ public class SpecialMember extends Member {
         super(id, loginId, loginPw, nickname);
         this.point = point;
     }
-    //6.
     @Override
     public void greeting() {
         System.out.printf("안녕하세요 우수회원 %s님 사랑합니다. 회원님의 남은 포인트는 현재 %s입니다.\n", this.nickname, this.point);
