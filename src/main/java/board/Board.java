@@ -167,6 +167,34 @@ public class Board extends Main {
         System.out.println("작성자 : " + boardArticle.nickname);
         System.out.println("등록날짜 : " + boardArticle.regDate);
         System.out.println("조회수 : " + boardArticle.hit);
+        // 1. 조회수를 boardArticle 출력시 같이 뿌려주도록 print문을 작성한다.
+        // System.out.println("좋아요 : ♡ 0");
+        // System.out.println("좋아요 : ♥ 1");
+        // 2. [좋아요 기능에 진입하자마자] null가능성을 가지는  like검색메소드 : getLike By 게시물id, 멤버id를 이용한 메소드를 재활용해서
+        // -> 내가 누른상탠지, 안누른 상태인지 확인해서 분기에 따라 뿌려준다.
+        // -> 1) add or remove결정할때도  -> 저장유무 = 체크유무 확인를 위해 like를 검색하고,
+        // -> 2) print할때도 -> 저장유무 = 체크유무 확인를 위해 like를 검색한다.
+        Like like = getLikeByArticleIdAndMemberId(boardArticle.id, loginedMember.id);
+        //6. 체크유무 print test가 끝났으면  --> 실제 좋아요수를 표시하도록 바꿔야한다.
+        // (개념정리)
+        //      1. 체크유무(하트색) : 게시글id, 로그인사람id 2개의 식별자를 통해, 내가 만든 Like객체가 arraylist에 들어가 있는지 확인
+        //        - 검색get메소드의 결과가 null이면, `내가` && `해당글`에 좋아요 안누른 상태다!
+        //      2. 좋아요 수 : 게시글id 1개의 식별자로 몇개의 Like객체가 arraylist에 들어가 있는지 확인
+        // -> **갯수를 센다? 저장소(db, list)를 돌면서, 해당글에 대한 like가 있는지, for검색하면서 세면 된다..**
+        // -> 출력하는 곳에서, 세는 과정을 넣으면 복잡해지니, 메소드로 뺀다.
+        // -> 1) 필요한 건???, 해당 게시물의id만 있으면 된다. memberId누가 썼는지는 몰라도됨. 갯수만 센다
+        // -> 2) 반환은 int로 할 예정
+        int likeCount = getLikeCountByArticleId(boardArticle.id);
+        if (like == null) {
+            // 8. print문 교체
+            // System.out.println("좋아요 : ♡ 0");
+            // -> 마지막 test, aaa아뒤로 좋아요 -> logout -> bbb아뒤로 좋아요 눌러서 확인해보기
+            System.out.printf("좋아요 : ♡ %d\n", likeCount);
+        } else {
+            System.out.printf("좋아요 : ♥ %d\n", likeCount);
+        } // 3. 여기까지만 작성하면, 좋아요 누른 뒤, 그 화면을 바로 볼 수 없다.
+        // -> **좋아요는 누른 뒤 바로. 상세화면 출력을 다시 한번 해줘야, 다시 진입안해도된다.**
+        // -> 즉, 하위메뉴readProcess()에서 like 로직끝나는 부분에서 printArticle() 한번더 호출해주자. -> 4.
         System.out.println("===================");
         System.out.println("======= 댓글 ======");
         for (ReplyArticle currentReplyArticle : replies) {
@@ -177,6 +205,17 @@ public class Board extends Main {
                 System.out.println("===================");
             }
         }
+    }
+
+    //7. 메소드 작성
+    private int getLikeCountByArticleId(int boardArticleId) {
+        int likeCount = 0;
+        for (Like like : likes) {
+            if (like.articleId == boardArticleId) {
+                likeCount++;
+            }
+        }
+        return likeCount;
     }
 
     private void readProcess(BoardArticle boardArticle) {
@@ -191,55 +230,33 @@ public class Board extends Main {
                 continue;
             }
             if (readCommand == 2) {
-
-                // 1. `체크여부`는 현재 likes라는 list에 add하였기 때문에, list에 있냐없냐로 분기를 나눌 수 있다.
-                // -> 체크해제(토글): `add(저장)`이후에, -> `db(list)에서 체크여부를 검사`가 가능해짐.
-                // -> 기능은 항상 add의(데이터생성 -> db저장)부터!! -> 그 이후에 검사or출력(list)등이 나온다.
-                // -> 체크여부를 db인 list를 반복문으로 돌면서 검색해야하는데,
-                // --> 메소드로 기능을 만들자. 들어가기전에 필요한 것?)
-                // getLikeBy();
-                // --> **필요한것) 게시글id, 멤버id 2개가 모두 있어야 식별이 가능하다!!!**
-                // --> cf) 한 게시물만 있으면, 누가눌렀는지 좋아요식별? ?ㄴㄴ 사람도 필요함.
-                // --> cf) 한 게시물에, 회원이 여러개의 좋아요? ㄴㄴ 1개만 가능 -> 식별됨.
-                // getLikeByArticleIdAndMemberId(boardArticle.id, loginedMember.id);
-                // -> like가 하나 나와서 받아주도록, 코드를 작성하고, 메소드를 작성해보자.
-                // Like like = getLikeByArticleIdAndMemberId(boardArticle.id, loginedMember.id);
-                // -> 2.
-                // 7. 검색용 get메소드를 작성하고 오니, like는 null가능성이 생겼다. -> 아래부분에서 if null처리해줘야한다.
-                // -> 사실 **list,db 검색용get메소드에서 null가능성이 있는 것이야말고, 체크여부에 따른 분기를 나누는 핵심로직이었다.**
                 Like like = getLikeByArticleIdAndMemberId(boardArticle.id, loginedMember.id);
 
-                // 8. ifn축약어로 null가능성의 like -> 체크여부로 철해보자.
                 if (like == null) {
-                    // 9. null이면 체크안한 상태 -> 체크(add)되도록 기존코드 옮기자.
-                    // Like like =
-                    like = new Like( boardArticle.id, loginedMember.id, MyUtil.getCurrentDate(dateFormat));
+                    like = new Like(boardArticle.id, loginedMember.id, MyUtil.getCurrentDate(dateFormat));
                     likes.add(like);
                     System.out.println("해당 게시물을 좋아합니다.");
+                    //5. 나는 if continue라서. 여기서도 추가로 프린트해줘야한다. continue아래로는 안내려가니까.
+                    printArticle(boardArticle);
                     continue;
                 }
-                //10. 그렇지 않다면, like가 이미 눌린상태로서 add(db저장)된 상태라면 remove시켜야한다.
                 likes.remove(like);
                 System.out.println("해당 게시물의 좋아요를 해제합니다.");
+                // 4. 둘중 택1의 좋아요 로직이 끝나고나서, 한번 더 출력해준다. 그래야 좋아요 누른 상태를 확인할 수 있다.
+                printArticle(boardArticle);
+
+
                 continue;
             }
         }
     }
 
     private Like getLikeByArticleIdAndMemberId(int boardArticleId, int loginedMemberId) {
-        // 2. 반복문 검색으로 뒤져보기
         for (Like like : likes) {
             if (boardArticleId == like.articleId && loginedMemberId == like.memberId) {
-                // 4. 찾았으면 호출한 곳으로 내보낸다.
                 return like;
-                // 3. 찾은 경우에만 break, 못찾은 경우(대부분이니므로) else하지말고 반복문을 나가서 처리
-                // break;
             }
         }
-        // 5. 다돌아도 못찾은 경우는 null이 나가도록 하면 된다.
-        // -> **get검색메소드내에서는  검색for문위의 초기변수 = null;은 필요없나보다.**
-        // -> **검색메소드, 검색반복문은 찾으면,   반복문위 변수=null에 할당이 아니라 return나가버리므로, 업데이트용 변수=null;은 필요없다.**
-        // 6. 메소드의 null반환(maybe get검색용메소드) -> 나가서, 뒤쪽에 if null처리 추가로 해줘야한다...
         return null;
     }
 
