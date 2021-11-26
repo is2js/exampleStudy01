@@ -164,11 +164,26 @@
     5. 댓글도 id는 변수=1 -> add시마다 변수++; 해주자.
        1. **add부터 하는 이유가 있는 듯..**
     6. 콘솔에서는 add하고 바로 list출력해줘야지 제대로 등록되었는지 확인이 된다.
-     
+    7. (추가)댓글구현2- (모든)댓글목록: 댓글등록후 상세보기 다시보여주고 + (모든)댓글목록 보여주기
+       1. 리팩토링 단축키(alt+ctrl+m 2번) 활용하기
+       2. **특정필드(id, number)등이 필요하면 ById, ByNumber를 메소드이름에 단다. 그게 아니면  동사+명사로**
+       3. 메소드화시켜서 가져왔는데 파라미터로 쓸게 없을 때
+          1. **호출하는 쪽으로 타고 타고 가서 발견될때까지 갔다가 계속 파라미터로 넘겨주기**
+       4. 댓글 목록은 상세보기(메소드)에다가 이어서 for문으로 돌면서 같이 뿌려준다.
+       5. reply든, article이든, `(중복/변경가능)nickname대신 memberId`를 필드로 가지고 있다가 -> 중복/변경가능한 nickname을 매번 조회해서 가져온다.
+          1. **생성자에는 nickname이 없어 null이지만, 조회시마다 메소드로 새 데이터를 채워넣는다!!**
+             1. **둘다 memberId외에 nickname 변수는 소지만하고, 생성자에는 없다!!!**
+          2. nickname채워주는 메소드 작성시, reply.memberId만 넘기지말고 객체를 통째로 넘겨줫다가, nickname이 채워진 객체를 통째로 받자!
+       6. iter로 향상된 for문이라도, 변수명은 reply -> currentReply 쓰려고 애써보자.
+       7. article이든, reply든, get으로 객체가 요청될 때, nickname까지 완성한 뒤 return해줘야한다. 
+          1. **객체 검색로직 직후에 nickname박는 로직도 같이 넣어줘야 완성된 객체가 반환된다.**
+             1. `article`의 경우, article객체검색로직 -> nickname채우는 로직 -> 완성된 aritcle객체 반환이었지만
+             2. `reply`는 검색X 반환X -> 바로 출력하기 때문에 -> 출력직전에 nickname을 채워, 완성된 nickname이 출력되게 한다.
+       8. **`if not null`에만 로직 작동 + `if문 바깥에서만 return` 하는 로직의 메소드 -> 파라미터가 null이면, 로직안거치고 바로 return null이 된다.**
 ## 기능 목록
 - add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test 회원 data 자동 생성 및 로그인시켜놓기 
 - logout -> login필요기능들 처리 -> member 식별번호 추가 ->  검색을 index->Article객체로 반환하도록 수정 + nickname변수를 Article에 추가하되, 생성자에선X -> Add시 노필요 default값만 유지하다가 조회시 Member에서 항상 최신값 받아오기
-- read(상세보기) 하위메뉴 -> 댓글 등록(add)
+- read(상세보기) 하위메뉴 -> 댓글 등록(add, 부모글정보X) 
 
 ## 기능 요구 사항
 - 상요구사항 - 댓글 기능 추가
