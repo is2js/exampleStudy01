@@ -158,7 +158,11 @@ public class Board extends Main {
         System.out.println("======= 댓글 ======");
         for (Reply currentReply : replies) {
             if (currentReply.parentId == article.id) {
-                currentReply = setReplyNickName(currentReply);
+                // 9. 다형성으로 리팩토링시 문제점은, 상카객체를 return하는 경우, 하카객체 자리에 바로 못들어간다.
+                // -> BaseInfo 자리엔 Reply가 들어가지만,  Reply = 자리엔, Baseinfo를 넣으려면 형변환을 해야한다.
+                // -> 호.. 다형성 리팩토링시, 상카객체를 return하는 메소들도 있으니, 메소드 호출처에서  = (작은것으로 형변환)은 필수적으로 들어간다.
+                // currentReply = setNickname(currentReply);
+                currentReply = (Reply) setNickname(currentReply);
                 System.out.println("내용 : " + currentReply.body);
                 System.out.println("작성일 : " + currentReply.regDate);
                 System.out.println("===================");
@@ -166,13 +170,14 @@ public class Board extends Main {
         }
     }
 
-    private Reply setReplyNickName(Reply currentReply) {
-        if (currentReply != null) {
-            Member writer = getMemberByMemberId(currentReply.memberId);
-            currentReply.nickname = writer.nickname;
-        }
-        return currentReply;
-    }
+    // 6.
+    // private Reply setReplyNickName(Reply currentReply) {
+    //     if (currentReply != null) {
+    //         Member writer = getMemberByMemberId(currentReply.memberId);
+    //         currentReply.nickname = writer.nickname;
+    //     }
+    //     return currentReply;
+    // }
 
     private void readProcess(Article article) {
         while (true) {
@@ -197,7 +202,7 @@ public class Board extends Main {
         String rbody = scanner.nextLine();
         int memberId = loginedMember.id;
         String regDate = MyUtil.getCurrentDate(dateFormat);
-        Reply reply = new Reply(replyNumber, article.id,rbody, memberId, regDate);
+        Reply reply = new Reply(replyNumber, article.id, rbody, memberId, regDate);
         replies.add(reply);
         replyNumber++;
         System.out.println("댓글이 등록되었습니다.");
@@ -308,16 +313,36 @@ public class Board extends Main {
             }
         }
 
-        targetArticle = setArticleNickname(targetArticle);
+        targetArticle = (Article) setNickname(targetArticle);
         return targetArticle;
     }
 
-    private Article setArticleNickname(Article targetArticle) {
-        if (targetArticle != null) {
-            Member writer = getMemberByMemberId(targetArticle.memberId);
-            targetArticle.nickname = writer.nickname;
+    // 5. 개념설명: (공통변수 혹은 )공통기능 뿐만 아니라 **하카 객체들이 비슷하게 사용(파라미터등에서)되는 타Class 메소드들을 -> 다형성으로 처리해준다.**
+    // 1) 공통변수 및 공통기능 뽑아내서 상카Class생성후 상속은 -> 하카 객체를 묶어줄 다형성 처리를 위한 발판임.
+    // 2) 주로 하위카테고리 객체들이 공통적으로 사용(주로 파라미터로)되는 곳을 묶어서 1개로 만든다.
+    // -> setArticleNickname(하카 객체1) 과 setReplyNickname(하카 객체2) 를 통합할 것이다.
+    // -> 1개의 메소드를 복붙해서 다형성 통합 메서드를 만들 준비한다.
+    // --> setArticleNickname() 복붙 -> setArticleNickname() 하나주석 + setReplyNickname()도 주석
+
+    // private Article setArticleNickname(Article targetArticle) {
+    //     if (targetArticle != null) {
+    //         Member writer = getMemberByMemberId(targetArticle.memberId);
+    //         targetArticle.nickname = writer.nickname;
+    //     }
+    //     return targetArticle;
+    // }
+
+    // 7. 메소드명에서 Article 단어를 지운다.
+    // private Article setNickname(Article targetArticle) {
+    // 8. 이제 하카객체 Article 파라미터 -> 하카 객체들 모두 받을 수 있게 상카Class, BaseClass객체를 받도록 한다  by 다형성
+    // private Article setNickname(Article targetArticle) {
+    // -> 그이후 빨간줄 나는 것들을 다 수정해준다.
+    private BaseInfo setNickname(BaseInfo info) {
+        if (info != null) {
+            Member writer = getMemberByMemberId(info.memberId);
+            info.nickname = writer.nickname;
         }
-        return targetArticle;
+        return info;
     }
 
     private Member getMemberByMemberId(int memberId) {

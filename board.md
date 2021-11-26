@@ -187,10 +187,21 @@
        3. **many속 `fk의 2가지 용도`를 깨달음..**
           1. **my) Reply속 memberId -> `정보조회용fk`** 
           2. **parentId -> `many(나)들 중 부모에 해당하는 것 일부만 추리는` 용도**
+    9. (추가)Reply+Article 상카Clas(baesClass)생성후 상속 -> 다형성으로 일괄처리 리팩토링
+       1. Article과 Reply는 `데이터저장용`Class로서 공통기능이 아닌 `공통변수`를 뽑아 상카Class(BaseClass)를 만든다.
+       2. 각 클래스는 상카Class(BaseClass)를 상속한다.
+       3. Base상카Class를 상속했다면, 공통변수들은 물려받게 되니 삭제한다.
+       4. (공통변수 혹은 )공통기능 뿐만 아니라 **하카 객체들이 비슷하게 사용(파라미터등에서)되는 타Class 메소드들을 -> 다형성으로 처리해준다.**
+          1. setArticleNickname() 복붙 -> setArticleNickname() 하나주석 + setReplyNickname()도 주석
+          2. 복붙한 메소드 코드에서 Article이란 단어를 삭제
+       5. 이제 하카객체 Article 파라미터 -> 하카 객체들 모두 받을 수 있게 상카Class, BaseClass객체를 받도록 한다  by 다형성
+          1. 빨간줄 나는 곳들을 F8로 찾아다니면서 수정해준다. 하카객체 및 메소드들 모두
+       6. 오호.. 다형성 리팩토링시, 상카객체를 return하는 메소들도 있으니, 메소드 호출처에서  = (작은것으로 형변환)은 필수적으로 들어간다.
 ## 기능 목록
 - add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test 회원 data 자동 생성 및 로그인시켜놓기 
 - logout -> login필요기능들 처리 -> member 식별번호 추가 ->  검색을 index->Article객체로 반환하도록 수정 + nickname변수를 Article에 추가하되, 생성자에선X -> Add시 노필요 default값만 유지하다가 조회시 Member에서 항상 최신값 받아오기
 - read(상세보기) 하위메뉴 -> 댓글 등록(add, 부모글정보X) -> (부모글정보X, 모든) 댓글 목록 -> Reply에 부모글번호도 보유 -> (특정)글에 대한 상세보기시 (해당)댓글만 보이게하기
+- Reply와 Article 공통기능 뽑아서 상카Class생성후 상속 -> 다형성으로 일괄처리 리팩토링
 
 ## 기능 요구 사항
 - 상요구사항 - 댓글 기능 추가
