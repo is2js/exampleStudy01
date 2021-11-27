@@ -71,7 +71,7 @@ public class BubbleSort {
         // -> 비교는 i, i+1로 계속하되, 작은 것을 i+1로 보내면 -> 맨끝에 작은 값들이 1개씩 적립될 것이다.
         for (int j = 1; j <= arr.length-1; j++) {
             for (int i = 0; i < arr.length - 1 -(j-1); i++) {
-                if (arr[i] > arr[i + 1]) {
+                if (arr[i] < arr[i + 1]) {
                     int temp = arr[i];
                     arr[i] = arr[i + 1];
                     arr[i + 1] = temp;
