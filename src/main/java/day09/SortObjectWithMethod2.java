@@ -25,33 +25,7 @@ public class SortObjectWithMethod2 {
         // -> 자바 왈 "sort()에 필요한 Comparator(컴패래이터) 인터페이스안에다가 메서드명을 강제해놨어. -> implements한 뒤 메서드명으로 써서
         // 코드를 넣어줘"
 
-        // class 사람 {
-        //     String 이름;
-        //     int 나이;
-        //
-        //     public 사람(String 이름, int 나이) {
-        //         this.이름 = 이름;
-        //         this.나이 = 나이;
-        //     }
-        //
-        //     void 자기소개() {
-        //         System.out.printf("안녕하세요 저는 %s이고, 나이 %d살 입니다.\n", this.이름, this.나이);
-        //     }
-        // }
-        //
-        // 사람 사람1 = new 사람("홍길동", 20);
-        // 사람 사람2 = new 사람("유관순", 17);
-        // 사람 사람3 = new 사람("을지문덕", 21);
-        // 사람 사람4 = new 사람("이순신", 30);
-        // 사람 사람5 = new 사람("강감찬", 28);
-        //
-        // ArrayList<사람> 사람들 = new ArrayList<>();
-        //
-        // 사람들.add(사람1);
-        // 사람들.add(사람2);
-        // 사람들.add(사람3);
-        // 사람들.add(사람4);
-        // 사람들.add(사람5);
+
 
         //18. 이제 2번째 인자에 Interface를 가지는 Sortor.sort(,)를 이용해서 numbers정렬해보자.
         // 1) 2번째 인자를 안넣으면 에러남.
@@ -124,6 +98,9 @@ class ComparatorImpl implements MyComparator {
         // 16. 현재상황(거품정렬)에서는 뭐가더 크냐?를 따져야하는 부분이다.
         // -> 밑에는 swap코드가 있으니, 만족시키는 상황에서 true를 리턴시키면 된다.
         // -> 즉, return true가 되는 조건은  int1 > int2 앞에께 더 큰 순간이다.
+        // (추가-객체.숫자변수 비교시) if ( 객체1.age > 객체2.age) : 숫자
+        // (추가-객체.문자열변수 비교시) if ( 객체1.compareTo(객체2) > 0 = 0 < 0 ) : 숫자
+
         if (int1 > int2) {
             return true;
         }
