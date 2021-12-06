@@ -7,7 +7,7 @@ public class Enum2 {
     public static void main(String[] args) {
         //
         System.out.println(Winner.WINNER.isWinner("ㄹㄹ)"));
-        System.out.println(Winner.isContains("패배", "bb"));
+        System.out.println(Winner.	isContains("패배", "bb"));
         System.out.println(Winner.isContains("승리", "ㄹㄹ"));
     }
 }
