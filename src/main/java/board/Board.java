@@ -1,13 +1,13 @@
 package board;
 
-import board.util.MyUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
-public class Board  { //extends Main
+import board.util.MyUtil;
+
+public class Board { // extends Main
 
     Scanner scanner = new Scanner(System.in);
     ArrayList<BoardArticle> boardArticles = new ArrayList<>();
@@ -88,7 +88,7 @@ public class Board  { //extends Main
                 }
                 continue;
             }
-            //1. 명령어 추가 -> 로그인 필요없는 기능 -> 바로 함수 정의해서 작성
+            // 1. 명령어 추가 -> 로그인 필요없는 기능 -> 바로 함수 정의해서 작성
             if (command.equals("sort")) {
                 sort();
                 continue;
@@ -105,25 +105,25 @@ public class Board  { //extends Main
         System.out.print("정렬 방법을 선택해주세요. (1. 오름차순,  2. 내림차순) : ");
         int type = Integer.parseInt(scanner.nextLine());
 
-        //3. 정렬을 하려면 바로 Collections.sort()부터 꺼낸다.
+        // 3. 정렬을 하려면 바로 Collections.sort()부터 꺼낸다.
         // -> 일단은, target무시하고, 조회수 hit로 정렬되도록 Comparator 구현체를 만들어 sort 2번째 인자로 넣어준다.
         // Collections.sort();
         // -> 정렬의 실제 대상은 List에 들어가 있는 DB들 중 1개임.
         // -> boardArticles는 객체리스트라 바로 정렬X -> sort의 2번째 인자를 작성해야한다.
-        // -> Comparator만들어서 정렬해줘야한다. cf) stream max()안에 기준을 넣어도 객체 1개 밖에 못꺼내지만, Comparator.comparingInt( 객체Class:: getter )
+        // -> Comparator만들어서 정렬해줘야한다. cf) stream max()안에 기준을 넣어도 객체 1개 밖에 못꺼내지만,
+        // Comparator.comparingInt( 객체Class:: getter )
         // Collections.sort( boardArticles);
         // -> 맨 밑에 직접 Comparator를 작성해주자. -> 4.
 
-        //7. 이제 Comparator<BoardArticle>를 구현한, ArticleComparator의 객체를 new생성자로 객체 생성해서 넣어주면 정렬된다.
+        // 7. 이제 Comparator<BoardArticle>를 구현한, ArticleComparator의 객체를 new생성자로 객체 생성해서 넣어주면 정렬된다.
         // -> sort( 대상list, comparator구현체객체 new로 생성)
-        Collections.sort( boardArticles, new ArticleComparator());
+        Collections.sort(boardArticles, new ArticleComparator());
 
-        //8. 애초에 초기 데이터가 조회수(hit)가 다 0이라서 정렬후 확인이 어려우니
+        // 8. 애초에 초기 데이터가 조회수(hit)가 다 0이라서 정렬후 확인이 어려우니
         // -> 초기데이터 hit를 수정좀 해주고 오자.
         // -> 실행 -> list -> sort , 1, 1(구현x), -> 다시 list
         // --> sort 한다음 바로 list도 보이게, 정렬된 db_lisst를 한번 더 호출해주자.
         list(boardArticles);
-
     }
 
     private void logout() {
@@ -246,7 +246,11 @@ public class Board  { //extends Main
                 Like like = getLikeByArticleIdAndMemberId(boardArticle.id, loginedMember.id);
 
                 if (like == null) {
-                    like = new Like(boardArticle.id, loginedMember.id, MyUtil.getCurrentDate(dateFormat));
+                    like =
+                            new Like(
+                                    boardArticle.id,
+                                    loginedMember.id,
+                                    MyUtil.getCurrentDate(dateFormat));
                     likes.add(like);
                     System.out.println("해당 게시물을 좋아합니다.");
                     printArticle(boardArticle);
@@ -255,7 +259,6 @@ public class Board  { //extends Main
                 likes.remove(like);
                 System.out.println("해당 게시물의 좋아요를 해제합니다.");
                 printArticle(boardArticle);
-
 
                 continue;
             }
@@ -425,31 +428,31 @@ public class Board  { //extends Main
     }
 }
 
-//4. Comparator.comparingInt 안쓸거면, -> 직접 Comparator<정렬할 객체Type>을 구현체 Class를 작성해야한다.
+// 4. Comparator.comparingInt 안쓸거면, -> 직접 Comparator<정렬할 객체Type>을 구현체 Class를 작성해야한다.
 // 2) MVC공부시에는, max(기준으로 객체::compareTo ) 사용하기 위해
-// 2-1) implements Comparable<Car> -> compareTo 오버라이딩 -> return Integer.compare(this.숫자변수, other객체.숫자변수getter())
+// 2-1) implements Comparable<Car> -> compareTo 오버라이딩 -> return Integer.compare(this.숫자변수,
+// other객체.숫자변수getter())
 // 3) stream에서  max( Comparator.comparingInt( 객체 :: getter )도 가능하다.
 class ArticleComparator implements Comparator<BoardArticle> {
     @Override
     public int compare(BoardArticle o1, BoardArticle o2) {
-        //5. compare 메서드는, 앞vs뒤 언제 자리바꿀껀지를 if + return으로 정해줘야한다.
+        // 5. compare 메서드는, 앞vs뒤 언제 자리바꿀껀지를 if + return으로 정해줘야한다.
         // -> if문에서, 정렬을 원하는 변수로 정해주면 되나보다.
         // -> **return 1;이 되는 분기 == 자리바꾸는 분기 == 왼쪽 > 오른쪽 일때 자리바꾼다? -> 오름차순
         // --> return 1;의 if분기면, 일단 자리바꿀건데, [부등호 큰쪽이 오른쪽으로 간다]  if  왼쪽 > 오른쪽이면,  -> 왼쪽이 오르쪽으로 간다?
-        // --> return -1;(0아님 ! 조심!)일때는 자리가 안바뀌는 분긴데, if 바뀌는 분기(return 1;) 안걸리면 분기 작성안해주고 바로 return -1;되게 한다.
+        // --> return -1;(0아님 ! 조심!)일때는 자리가 안바뀌는 분긴데, if 바뀌는 분기(return 1;) 안걸리면 분기 작성안해주고 바로 return
+        // -1;되게 한다.
         // if () {
         //     return 1;
         // }
         // return -1;
 
-        //6. 왼쪽객체를 언제 오른쪽으로 보낼까? 클때? 작을때?
+        // 6. 왼쪽객체를 언제 오른쪽으로 보낼까? 클때? 작을때?
         // -> 왼쪽이 클때, (오른쪽으로)보내면(return 1;)? 오름차순
         // -> 왼쪽이 작을때 보낸다면? 내림차순
-        if ( o1.hit > o2.hit) {
+        if (o1.hit > o2.hit) {
             return 1;
         }
         return -1;
-
-
     }
 }
