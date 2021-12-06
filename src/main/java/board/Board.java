@@ -88,7 +88,6 @@ public class Board { // extends Main
                 }
                 continue;
             }
-            // 1. 명령어 추가 -> 로그인 필요없는 기능 -> 바로 함수 정의해서 작성
             if (command.equals("sort")) {
                 sort();
                 continue;
@@ -99,30 +98,19 @@ public class Board { // extends Main
     }
 
     private void sort() {
-        // 2. 진입하자마자, [정렬대상(기준) -> 방법 순으로 한꺼번에 ] 안내문 + input받기
         System.out.print("정렬 대상을 선택해주세요. (1. 번호,  2. 조회수) : ");
         int target = Integer.parseInt(scanner.nextLine());
         System.out.print("정렬 방법을 선택해주세요. (1. 오름차순,  2. 내림차순) : ");
         int type = Integer.parseInt(scanner.nextLine());
 
-        // 3. 정렬을 하려면 바로 Collections.sort()부터 꺼낸다.
-        // -> 일단은, target무시하고, 조회수 hit로 정렬되도록 Comparator 구현체를 만들어 sort 2번째 인자로 넣어준다.
-        // Collections.sort();
-        // -> 정렬의 실제 대상은 List에 들어가 있는 DB들 중 1개임.
-        // -> boardArticles는 객체리스트라 바로 정렬X -> sort의 2번째 인자를 작성해야한다.
-        // -> Comparator만들어서 정렬해줘야한다. cf) stream max()안에 기준을 넣어도 객체 1개 밖에 못꺼내지만,
-        // Comparator.comparingInt( 객체Class:: getter )
-        // Collections.sort( boardArticles);
-        // -> 맨 밑에 직접 Comparator를 작성해주자. -> 4.
+        //1. 대박)
+        // -> Comparator구현체 객체를 sort() 2번째 인자로 사용하는 상황에서, `생성자의 파라미터로 입력받은 target(변수), type(정렬방법)받아서` 구현체 객체 생성시 사용해서 생성하기
+        // Collections.sort(boardArticles, new ArticleComparator());
+        // new ArticleComparator() 구현체 객체를 사용하는 상황이라면,
+        // 2) 구현체 [객체가 생성되기 전] 에, 내부에서 작성에 이용된 뒤 -> 객체로 나와서 기준으로 사용되어야한다.
+        // new ArticleComparator(target, type)
+        Collections.sort(boardArticles, new ArticleComparator(target, type));
 
-        // 7. 이제 Comparator<BoardArticle>를 구현한, ArticleComparator의 객체를 new생성자로 객체 생성해서 넣어주면 정렬된다.
-        // -> sort( 대상list, comparator구현체객체 new로 생성)
-        Collections.sort(boardArticles, new ArticleComparator());
-
-        // 8. 애초에 초기 데이터가 조회수(hit)가 다 0이라서 정렬후 확인이 어려우니
-        // -> 초기데이터 hit를 수정좀 해주고 오자.
-        // -> 실행 -> list -> sort , 1, 1(구현x), -> 다시 list
-        // --> sort 한다음 바로 list도 보이게, 정렬된 db_lisst를 한번 더 호출해주자.
         list(boardArticles);
     }
 
@@ -428,31 +416,81 @@ public class Board { // extends Main
     }
 }
 
-// 4. Comparator.comparingInt 안쓸거면, -> 직접 Comparator<정렬할 객체Type>을 구현체 Class를 작성해야한다.
-// 2) MVC공부시에는, max(기준으로 객체::compareTo ) 사용하기 위해
-// 2-1) implements Comparable<Car> -> compareTo 오버라이딩 -> return Integer.compare(this.숫자변수,
-// other객체.숫자변수getter())
-// 3) stream에서  max( Comparator.comparingInt( 객체 :: getter )도 가능하다.
 class ArticleComparator implements Comparator<BoardArticle> {
+    private int target; // 3. 번호(1.) vs 조회수(2.) 분기로 택1되도록 짜야한다.
+    private int type; // 4. 오름차순(1.) vs 내림차순(2.) 분기로 택1되록 짜야한다.
+
+    public ArticleComparator(int target, int type) {
+        //2. 구현체 객체를 사용하는 곳에서, 객체생성에 필요한 정보를 파라미터로 준다면
+        // 생성자에서 this.로 받아줘야하며, 자연스레 인스턴스변수도 생성된다.
+        this.target = target;
+        this.type = type;
+    }
+
+
     @Override
     public int compare(BoardArticle o1, BoardArticle o2) {
-        // 5. compare 메서드는, 앞vs뒤 언제 자리바꿀껀지를 if + return으로 정해줘야한다.
-        // -> if문에서, 정렬을 원하는 변수로 정해주면 되나보다.
-        // -> **return 1;이 되는 분기 == 자리바꾸는 분기 == 왼쪽 > 오른쪽 일때 자리바꾼다? -> 오름차순
-        // --> return 1;의 if분기면, 일단 자리바꿀건데, [부등호 큰쪽이 오른쪽으로 간다]  if  왼쪽 > 오른쪽이면,  -> 왼쪽이 오르쪽으로 간다?
-        // --> return -1;(0아님 ! 조심!)일때는 자리가 안바뀌는 분긴데, if 바뀌는 분기(return 1;) 안걸리면 분기 작성안해주고 바로 return
-        // -1;되게 한다.
-        // if () {
-        //     return 1;
+        // 5. 스킬!! 오름차순 vs 내림차순은 return 1; return -1;이 서로 바뀌면 된다.
+        // -> type==2이면, 각각에 * -1을 시켜주면 된다.
+        // -> ** default 1이나 type ==2시, -1로 변하는 변수 result를 곱해주는 sense **
+        // --> 이 때, 매 비교시마다 default가 1이 되어야하므로, 비교메서드 안에서 1을 만들어주고 시작한다.
+        // int result = 1;
+        // if (this.type == 2) {
+        //     result *= -1;
         // }
-        // return -1;
 
-        // 6. 왼쪽객체를 언제 오른쪽으로 보낼까? 클때? 작을때?
-        // -> 왼쪽이 클때, (오른쪽으로)보내면(return 1;)? 오름차순
-        // -> 왼쪽이 작을때 보낸다면? 내림차순
-        if (o1.hit > o2.hit) {
-            return 1;
+        // 6. 이제 target에 따라, o1.hit를 꺼낼 것인지 o1.Id를 꺼낼 것인지 분기가 일어나야한다.
+        // -> 함수로 만들어야한다.
+        // -> o1.변수만 바꾸는 분기는 못 만들기 때문에
+        // -->1) 분기를 결정짓는 조건변수를 파라미터로 받은, 함수로 만들어서, 각 변수꺼낼때마다의 로직을 if if 일일히 다 적어줘야함
+        // -->2) 각 꺼내는 변수의 로직마다 결과값만 다르게 함수에서 건네주자.
+        // -->3) compare가 받는 것은  return 1 아니면 -1이기 때문에
+        // -->4) 우리만 알도록 기준변수 결정 -> 그 때마다 return 1, -1; 되도록 짜준다.
+        // if (o1.hit > o2.hit) {
+        //     // return 1;
+        //     // return 1*result; // 1 x result 는 무조건 result다 ㅋㅋ
+        //     return result;
+        // }
+        // // return -1;
+        // return -1*result;
+
+        // 7. 메서드 -> << 그 내부에서 target에 따라 서로다른 분기로>> -> 외부compare에 return 1; return -1;을 전달해주기
+        // getCompareResult(o1, o2);
+        //11. 이제 외부의 compare속에서 받은, 분기별 변수기준별 return된 1 or -1 값을 변수로 받아서
+        // -> 다시 한번 type==1 vs2 분기별로 -1을 곱해서 오름내림차순을 바꿔주고 최종 compare에게 return해준다.ㅣ
+        int result = getCompareResult(o1, o2);
+        if (type ==2) {
+            result *= -1;
         }
-        return -1;
+        return result;
+    }
+
+    //8. 작성하기
+    // private void getCompareResult() {
+    //     if (o1.hit > o2.hit) {
+    //         return result;
+    //     }
+    // -> 기존 로직 복붙하다보니 o1, o2필요함.
+    private int getCompareResult(BoardArticle o1, BoardArticle o2) {
+        // 9. type은 class내 인스턴스 변수라서 안받아도 됨.
+        if (type == 1) {
+            if (o1.id > o2.id) {
+                // 10. 이제 result는 바깥에서 해결해주고, 분기별 기준변수를 바꾸면서 우리는 1, -1만 넘겨주자.
+                // return result;
+                return 1;
+            }
+            return -1;
+        }
+
+        if (type == 2) {
+            if (o1.hit > o2.hit) {
+                // 10. 이제 result는 바깥에서 해결해주고, 분기별 기준변수를 바꾸면서 우리는 1, -1만 넘겨주자.
+                // return result;
+                return 1;
+            }
+            return -1;
+        }
+
+        return 0;
     }
 }
