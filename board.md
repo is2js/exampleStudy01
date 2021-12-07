@@ -322,6 +322,12 @@
              2. 메서드화해서, 필요한 곳에 메서드를 호출하는 식으로 바꾼다.
              3. 현재페이지번호 변화에 따른 -> 연산처리, 업데이트되는 종속 변수를 메서드화
           3. 클래스내 무지성으로 모은 변수들 -> 메서드화 시킨 메서드()호출로 바꿔준다.
+       5. 페이징시 문자열 숫자를 파싱하는 부분 올바른 입력숫자 입력될대까지 무한반복되게 예외처리를 해준다.
+          1. try에서 parseInt시도 -> 성공시 break
+          2. catch에서는 그냥 흘러가도록 해서 while (true) 무한반복되게 
+             1. 하면, 올바른 값 입력까지 무한으로 입력받을 수 있다.
+          3. 메서드()는 파라미터없이 내부반복문에서 스캐너매번 호출 -> 올바른 값 입력까지 무한입력받고, parsing된 int를 반환하도록 메서드화 해서-> 메서드로 대체하여 pageCommand=에 할당한다.
+          4. parseInt를 쓰는 모든 곳을 메서드 inputIntData() 로 변환한다.
 ## 기능 목록
 - add(추가) ->list(출력) -> test data -> update(수정)  -> delete(삭제) -> search(검색) -> add2(데이터 추가, 날짜Util) -> read(상세보기+조회수변수) -> signup(회원Class의 객체를 arraylist에 add) -> login-1(Id, Pw확인구현) -> login-2(로그인 유지) -> test 회원 data 자동 생성 및 로그인시켜놓기 
 - logout -> login필요기능들 처리 -> member 식별번호 추가 ->  검색을 index->Article객체로 반환하도록 수정 + nickname변수를 Article에 추가하되, 생성자에선X -> Add시 노필요 default값만 유지하다가 조회시 Member에서 항상 최신값 받아오기

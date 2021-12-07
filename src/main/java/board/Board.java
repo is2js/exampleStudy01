@@ -14,7 +14,7 @@ public class Board {
     ArrayList<Member> members = new ArrayList<>();
     ArrayList<ReplyArticle> replies = new ArrayList<>();
     ArrayList<Like> likes = new ArrayList<>();
-    int boardArticleNumber = 1 + 3; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
+    int boardArticleNumber = 1 + 3 + 27; // 게시물 고유번호 시작번호 + Test데이터 3개 들어감.
     int memberNumber = 1 + 2; // 회원 고유번호
     int replyArticleNumber = 1; // 댓글 고유번호
     Member loginedMember = null;
@@ -107,7 +107,54 @@ public class Board {
     private void page() {
         while (true) {
             System.out.print("페이징 명령어를 입력해주세요 ((1. 이전,  2. 다음,  3. 선택,  4. 뒤로가기): ");
-            int pageCommand = Integer.parseInt(scanner.nextLine());
+            //1.[문자열숫자를 받는 부분]은 -> [parseInt하는] 부분에서 에러 발생가능하므로 예외처리를 한다
+            // -> try 밑에서도 써야하는 변수선언은, 위에 미리 default값으로 선언해놓고 try내부에선 할당만
+            // int pageCommand = Integer.parseInt(scanner.nextLine());
+
+            //8. 메서드로 무한반복으로 올바른값 입력받고 난 뒤 parsing된 int를 받는다.
+            // -> 인자로 스캐너 입력값을 받는다!
+            // int pageCommand = 0;
+            int pageCommand = inputIntData();
+            //9. parseInt쓰는 모든 곳을 convertStringToInt(scanner.nextLine())로 변환
+
+
+            // try{
+            //     pageCommand = Integer.parseInt(scanner.nextLine());
+            // } catch (NumberFormatException e) {
+            //     // 2. catch부분은 해당 예외발생시, 프로그램 끄지말고 이 코드를 실행해줘! 다
+            //     System.out.println("숫자만 입력해야 합니다.");
+            //     // 3. 종료를 안시키니 밑으로 타고 내려가는데,
+            //     // -> 에러가 나면 pageCommand는 defatul값 0으로 내려가므로,
+            //     // -> 분기를 안탄다.
+            //     // -> 분기 안타면, list() 호출후 다시 반복문 반복되므로..
+            //     // -> 분기 안타는 제일 끝엔.. 예외처리를 해줬었는데
+            //     // -> 여기서는 여러분기상 list()를 태워야하니..
+            //     // -> [[[default값 분기]]]를 세로 만들자.
+            // }
+            //4. 원래는 분기예외처리를, if continue 분기들 -> 안걸리는 부분 = 예외 = 분기없는 맨끝에서 처리였으나
+            // -> 모든 분기마다 if 처리 후, continue없이,  공통작업 list()호출인 상황에서는
+            // -> [입력받지 않은 default 값으로 분기 생성]하여 예외처리 되게 한다.
+
+            //5. 만약 올바른 값이 입력될때까지 계속해서 받아야한다면???
+            // -> while (true)안에 집어넣고, try 제대로 파싱시 break; catch 끄지말고, 여기서 그대로 내려가면 다시 while문으로..
+            // --> [[try parse.Int시에만 while (true) 탈출]]하게 작성하면, 올바른값입력할때까지 계속 입력 받을 수 있다.
+            // while (true) {
+            //     try {
+            //         pageCommand = Integer.parseInt(scanner.nextLine());
+            //         // 1) 파싱성공시 탈출부만 있으면, 올바른 값 -> 파싱성공-> break 외에는 무한반복이 되게 할 수 있다.
+            //         break;
+            //     } catch (NumberFormatException e) {
+            //         // 2) catch부분에서는 그냥 흘러가면 알아서, 무한 입력 시도가 된다.
+            //         // -> parseInt로 검색해서, 파싱하는 부분은 다 이렇게 만들어주면 예외처리가 된다.
+            //         // -> 그런데 integer쓰는 곳마다 try/catch 다해주면 번거러우니 메소드로 만든다.
+            //         // -> 7. 메소드에 짤라넣음.
+            //         System.out.println("숫자만 입력해야 합니다.");
+            //     }
+            // }
+
+            if (pageCommand == 0) {
+                System.out.println(" 알 수 없는 명령입니다.");
+            }
             if (pageCommand == 1) {
                 pagination.currentPageNo--;
             }
@@ -123,11 +170,32 @@ public class Board {
 
     }
 
+    //7. String입력(scanner.nextLine()을 받을예정!)을 받아서 -> paringInt가 성공할때까지 시도하다가 - int를 반환해주는 메소드다.
+    private int inputIntData() {
+        // 1) try에서 성공시 숫자로 받아줄 변수 with default값 생성
+        int convertedData = 0;
+        while (true) {
+            try {
+                // 2) scanner.nextLine() -> 이제 메서드밖에서 파라미터 String data로 들어올 것이니 변경
+                // -> 이렇게 될 경우, 한번 호출시,, 입력이 무조건 data로 고정되어버린다.
+                // -> 파라미터를 없애고, scanner를 매번 호출하도록 변경함.
+                // --> **반복문을 포함한 메서드에서는 스캐너값을 인자로 넣지말고, 메서드 내부에서  스캐너를 쓰자!!**
+                // --> 그래야 매번 반복문에서 호출시마다 새롭게 값을 받아준다.
+                convertedData = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("숫자만 입력해야 합니다.");
+            }
+        }
+        return convertedData;
+
+    }
+
     private void sort() {
         System.out.print("정렬 대상을 선택해주세요. (1. 번호,  2. 조회수) : ");
-        int target = Integer.parseInt(scanner.nextLine());
+        int target = inputIntData();
         System.out.print("정렬 방법을 선택해주세요. (1. 오름차순,  2. 내림차순) : ");
-        int type = Integer.parseInt(scanner.nextLine());
+        int type = inputIntData();
 
         Collections.sort(boardArticles, new ArticleComparator(target, type));
 
@@ -165,7 +233,7 @@ public class Board {
 
     private void signup() {
         System.out.print("1. 일반회원, 2. 우수회원 : ");
-        int memberFlag = Integer.parseInt(scanner.nextLine());
+        int memberFlag = inputIntData();
 
         System.out.print("아이디를 입력해주세요 : ");
         String loginId = scanner.nextLine();
@@ -188,7 +256,7 @@ public class Board {
 
     private void readArticles() {
         System.out.print("상세보기할 게시물 번호를 입력해주세요 : ");
-        int target = Integer.parseInt(scanner.nextLine());
+        int target = inputIntData();
         BoardArticle boardArticle = getArticleByArticleNumber(target);
         if (boardArticle == null) {
             System.out.println("없는 게시물 번호입니다.");
@@ -242,7 +310,7 @@ public class Board {
     private void readProcess(BoardArticle boardArticle) {
         while (true) {
             System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 좋아요, 3. 수정, 4. 삭제, 5. 목록으로) : ");
-            int readCommand = Integer.parseInt(scanner.nextLine());
+            int readCommand = inputIntData();
             if (readCommand == 5) {
                 break;
             }
@@ -301,7 +369,6 @@ public class Board {
         boardArticles.add(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
         boardArticles.add(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
         boardArticles.add(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
-        // 1. 페이지당 보여질 게시물을 위해, 보여질 게시물을 좀 많게 추가해 준다.
         for (int i = 4; i<=30; i++) {
             boardArticles.add(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
         }
@@ -328,7 +395,7 @@ public class Board {
 
     private void deleteArticle() {
         System.out.print("삭제할 게시물 번호 : ");
-        int target = Integer.parseInt(scanner.nextLine());
+        int target = inputIntData();
         BoardArticle boardArticle = getArticleByArticleNumber(target);
 
         if (boardArticle == null) {
@@ -343,7 +410,7 @@ public class Board {
 
     private void updateArticle() {
         System.out.print("수정할 게시물 번호 : ");
-        int target = Integer.parseInt(scanner.nextLine());
+        int target = inputIntData();
         BoardArticle boardArticle = getArticleByArticleNumber(target);
         if (boardArticle == null) {
             System.out.println("없는 게시물 번호입니다.");
@@ -429,22 +496,7 @@ public class Board {
     }
 
     public void list(ArrayList<BoardArticle> list) {
-        //2. 30개를 한번에 뿌려주는 곳으로 와서, 3개씩 어떻게 뿌려줄까 생각해본다.
-        // -> for의 시작과 끝을, 1) 현재페이지번호를  통한,
-        // -> 2) 페보겟을 이용해서, 현재페이지에서, 0부터 index시작번호, index끝번호를 받아오면 된다.
-        // --> 이미 Pagination에 수식을 통한 변수를 생성해놨으니..
-        // --> 가져다쓰면 된다.
-        // for (int i = 0; i < list.size(); i++) {
-        //8. 현재페이지번호 변화에 따른 -> 연산처리, 업데이트되는 종속 변수를 메서드화했음 ->
-        // for (int i = pagination.startIndex; i < pagination.endIndex; i++) {
         for (int i = pagination.getStartIndex(); i < pagination.getEndIndex(); i++) {
-            //3. test해보면 문제가 여전히 남아있다.
-            // -> 다음페이지로 가도, 현재페이지번호 업데이트는되나
-            // --> **종속으로 반복문내에서 업데이트되던 변수들은 업데이트가 안되는 실정**
-            // --> 사용자입력으로 현재페이지번호 업뎃 -> [종속변수들 다 업뎃]과정이 빠진 상태
-            // --> Paginatino안에 있는 [계산으로 만들어지는 변수들] == [부모변수 업데이트시 다 업데이트 한번 더 해줘야하는 변수들]이다.
-            // -> 4. 다시 Pagination으로 가자.
-
             BoardArticle boardArticle = list.get(i);
             System.out.println("번호 : " + boardArticle.id);
             System.out.println("제목 : " + boardArticle.title);
@@ -454,8 +506,6 @@ public class Board {
             System.out.println("====================================");
         }
 
-        // 9.여기도, 변수로 쓰던 곳 -> 메서드호출로 업데이트된 값을 사용
-        // for (int i = pagination.startPageNoInBlock; i <= pagination.endPageNoInBlock; i++) {
         for (int i = pagination.getStartPageNoInBlock(); i <= pagination.getEndPageNoInBlock(); i++) {
             if (i == pagination.currentPageNo) {
                 System.out.print("[" + i + "] ");
