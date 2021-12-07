@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 import board.util.MyUtil;
 
-public class Board { // extends Main
+public class Board {
 
     Scanner scanner = new Scanner(System.in);
     ArrayList<BoardArticle> boardArticles = new ArrayList<>();
@@ -93,6 +93,12 @@ public class Board { // extends Main
                 continue;
             }
 
+            //1. 페이징은 바로 접근하면 어렵다. -> Test class를 만들어서 연습한다.
+            // -> 2. [PagingTest.java]
+            if (command.equals("page")) {
+                continue;
+            }
+
             System.out.println("잘못 입력하였습니다.");
         }
     }
@@ -103,12 +109,6 @@ public class Board { // extends Main
         System.out.print("정렬 방법을 선택해주세요. (1. 오름차순,  2. 내림차순) : ");
         int type = Integer.parseInt(scanner.nextLine());
 
-        //1. 대박)
-        // -> Comparator구현체 객체를 sort() 2번째 인자로 사용하는 상황에서, `생성자의 파라미터로 입력받은 target(변수), type(정렬방법)받아서` 구현체 객체 생성시 사용해서 생성하기
-        // Collections.sort(boardArticles, new ArticleComparator());
-        // new ArticleComparator() 구현체 객체를 사용하는 상황이라면,
-        // 2) 구현체 [객체가 생성되기 전] 에, 내부에서 작성에 이용된 뒤 -> 객체로 나와서 기준으로 사용되어야한다.
-        // new ArticleComparator(target, type)
         Collections.sort(boardArticles, new ArticleComparator(target, type));
 
         list(boardArticles);
@@ -417,12 +417,10 @@ public class Board { // extends Main
 }
 
 class ArticleComparator implements Comparator<BoardArticle> {
-    private int target; // 3. 번호(1.) vs 조회수(2.) 분기로 택1되도록 짜야한다.
-    private int type; // 4. 오름차순(1.) vs 내림차순(2.) 분기로 택1되록 짜야한다.
+    private int target;
+    private int type;
 
     public ArticleComparator(int target, int type) {
-        //2. 구현체 객체를 사용하는 곳에서, 객체생성에 필요한 정보를 파라미터로 준다면
-        // 생성자에서 this.로 받아줘야하며, 자연스레 인스턴스변수도 생성된다.
         this.target = target;
         this.type = type;
     }
@@ -430,34 +428,6 @@ class ArticleComparator implements Comparator<BoardArticle> {
 
     @Override
     public int compare(BoardArticle o1, BoardArticle o2) {
-        // 5. 스킬!! 오름차순 vs 내림차순은 return 1; return -1;이 서로 바뀌면 된다.
-        // -> type==2이면, 각각에 * -1을 시켜주면 된다.
-        // -> ** default 1이나 type ==2시, -1로 변하는 변수 result를 곱해주는 sense **
-        // --> 이 때, 매 비교시마다 default가 1이 되어야하므로, 비교메서드 안에서 1을 만들어주고 시작한다.
-        // int result = 1;
-        // if (this.type == 2) {
-        //     result *= -1;
-        // }
-
-        // 6. 이제 target에 따라, o1.hit를 꺼낼 것인지 o1.Id를 꺼낼 것인지 분기가 일어나야한다.
-        // -> 함수로 만들어야한다.
-        // -> o1.변수만 바꾸는 분기는 못 만들기 때문에
-        // -->1) 분기를 결정짓는 조건변수를 파라미터로 받은, 함수로 만들어서, 각 변수꺼낼때마다의 로직을 if if 일일히 다 적어줘야함
-        // -->2) 각 꺼내는 변수의 로직마다 결과값만 다르게 함수에서 건네주자.
-        // -->3) compare가 받는 것은  return 1 아니면 -1이기 때문에
-        // -->4) 우리만 알도록 기준변수 결정 -> 그 때마다 return 1, -1; 되도록 짜준다.
-        // if (o1.hit > o2.hit) {
-        //     // return 1;
-        //     // return 1*result; // 1 x result 는 무조건 result다 ㅋㅋ
-        //     return result;
-        // }
-        // // return -1;
-        // return -1*result;
-
-        // 7. 메서드 -> << 그 내부에서 target에 따라 서로다른 분기로>> -> 외부compare에 return 1; return -1;을 전달해주기
-        // getCompareResult(o1, o2);
-        //11. 이제 외부의 compare속에서 받은, 분기별 변수기준별 return된 1 or -1 값을 변수로 받아서
-        // -> 다시 한번 type==1 vs2 분기별로 -1을 곱해서 오름내림차순을 바꿔주고 최종 compare에게 return해준다.ㅣ
         int result = getCompareResult(o1, o2);
         if (type ==2) {
             result *= -1;
@@ -465,18 +435,9 @@ class ArticleComparator implements Comparator<BoardArticle> {
         return result;
     }
 
-    //8. 작성하기
-    // private void getCompareResult() {
-    //     if (o1.hit > o2.hit) {
-    //         return result;
-    //     }
-    // -> 기존 로직 복붙하다보니 o1, o2필요함.
     private int getCompareResult(BoardArticle o1, BoardArticle o2) {
-        // 9. type은 class내 인스턴스 변수라서 안받아도 됨.
         if (type == 1) {
             if (o1.id > o2.id) {
-                // 10. 이제 result는 바깥에서 해결해주고, 분기별 기준변수를 바꾸면서 우리는 1, -1만 넘겨주자.
-                // return result;
                 return 1;
             }
             return -1;
@@ -484,13 +445,10 @@ class ArticleComparator implements Comparator<BoardArticle> {
 
         if (type == 2) {
             if (o1.hit > o2.hit) {
-                // 10. 이제 result는 바깥에서 해결해주고, 분기별 기준변수를 바꾸면서 우리는 1, -1만 넘겨주자.
-                // return result;
                 return 1;
             }
             return -1;
         }
-
-        return 0;
+        return 1;
     }
 }
