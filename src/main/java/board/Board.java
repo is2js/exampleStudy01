@@ -93,8 +93,6 @@ public class Board {
                 continue;
             }
 
-            //1. 페이징은 바로 접근하면 어렵다. -> Test class를 만들어서 연습한다.
-            // -> 2. [PagingTest.java]
             if (command.equals("page")) {
                 continue;
             }
