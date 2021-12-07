@@ -19,8 +19,6 @@ public class Board {
     int replyArticleNumber = 1; // 댓글 고유번호
     Member loginedMember = null;
     String dateFormat = "yyyy.MM.dd";
-    //5. 페이지내이션 기능 사용을 위해 객체를 만든다. -> 생성자 없으면 노파라미터로서 생략된 기본생성자.
-    // -> 이제 페이지네이션을 list()에 적용한다. -> 6.
     Pagination pagination = new Pagination();
 
 
@@ -98,7 +96,6 @@ public class Board {
             }
 
             if (command.equals("page")) {
-                //9. 분기에 page()메서드를 넣어 기능 진입하게 하기
                 page();
                 continue;
             }
@@ -108,34 +105,19 @@ public class Board {
     }
 
     private void page() {
-        //12. [안내문부터 + 입력받고 -> 출력]을 한번 진입시 계속 반복하도록
-        // -> while (true)로 감싸준다.
         while (true) {
-            // 10. 요구사항 안내문
             System.out.print("페이징 명령어를 입력해주세요 ((1. 이전,  2. 다음,  3. 선택,  4. 뒤로가기): ");
-            // -> 다시 명령어 입력받아 분기하는 코드를 복사해와서 맞게 수정한다.
             int pageCommand = Integer.parseInt(scanner.nextLine());
             if (pageCommand == 1) {
-                // currentPageNo++;
                 pagination.currentPageNo--;
             }
             if (pageCommand == 2) {
-                // currentPageNo--;
                 pagination.currentPageNo++;
-            }// -> 여기까지 하고 잘 움직여지는지 테스트 -> 이전 or 다음후, list()를 한번 출력해줘야한다.
-            //13. 4 누르면 종료하도록 분기 추가
+            }
             if (pageCommand == 4) {
                 break;
             }
 
-            // 11. 이전/다음 등의 [입력받은데로 수정후 바로 다시 출력]해줘야 사용자들이 확인할 수 있다.
-            // -> page, 다음, page, 다음 반복하다가 5를 넘어가니까, 페이지블럭 안바뀌고 [ ]가 안보임.
-            // -> 문제해결해야함. -> list()출력시 페이지블럭 업데이트에 따른, 페이지시작번호 변화가 반영이 안된듯?
-            // --> **업데이트 -> 다시 변수에 반영을 해줘야하는데,**
-            // --> Pagination클래스에 변수를 <층 고려안하고 다 몰아넣어놓고>, 최초에 생성후 업데이트가 안되는로직이라서 그럼.
-            // -> 나중에 고려하고..
-            // --> 매번 page 를 치고 이전or다음 -> page.. 반복해야하므롤
-            // -> 한번 page치고 들어오면 ,입력받아 그만둘때까지 반복되도록 while문으로 감싸자
             list(boardArticles);
         }
 
@@ -319,6 +301,11 @@ public class Board {
         boardArticles.add(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
         boardArticles.add(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
         boardArticles.add(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
+        // 1. 페이지당 보여질 게시물을 위해, 보여질 게시물을 좀 많게 추가해 준다.
+        for (int i = 4; i<=30; i++) {
+            boardArticles.add(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
+        }
+
         members.add(new GeneralMember(1, "aaa", "aaa", "조재성"));
         members.add(new SpecialMember(2, "bbb", "bbb", "김석영", 0));
 
@@ -442,7 +429,22 @@ public class Board {
     }
 
     public void list(ArrayList<BoardArticle> list) {
-        for (int i = 0; i < list.size(); i++) {
+        //2. 30개를 한번에 뿌려주는 곳으로 와서, 3개씩 어떻게 뿌려줄까 생각해본다.
+        // -> for의 시작과 끝을, 1) 현재페이지번호를  통한,
+        // -> 2) 페보겟을 이용해서, 현재페이지에서, 0부터 index시작번호, index끝번호를 받아오면 된다.
+        // --> 이미 Pagination에 수식을 통한 변수를 생성해놨으니..
+        // --> 가져다쓰면 된다.
+        // for (int i = 0; i < list.size(); i++) {
+        //8. 현재페이지번호 변화에 따른 -> 연산처리, 업데이트되는 종속 변수를 메서드화했음 ->
+        // for (int i = pagination.startIndex; i < pagination.endIndex; i++) {
+        for (int i = pagination.getStartIndex(); i < pagination.getEndIndex(); i++) {
+            //3. test해보면 문제가 여전히 남아있다.
+            // -> 다음페이지로 가도, 현재페이지번호 업데이트는되나
+            // --> **종속으로 반복문내에서 업데이트되던 변수들은 업데이트가 안되는 실정**
+            // --> 사용자입력으로 현재페이지번호 업뎃 -> [종속변수들 다 업뎃]과정이 빠진 상태
+            // --> Paginatino안에 있는 [계산으로 만들어지는 변수들] == [부모변수 업데이트시 다 업데이트 한번 더 해줘야하는 변수들]이다.
+            // -> 4. 다시 Pagination으로 가자.
+
             BoardArticle boardArticle = list.get(i);
             System.out.println("번호 : " + boardArticle.id);
             System.out.println("제목 : " + boardArticle.title);
@@ -451,21 +453,10 @@ public class Board {
             System.out.println("조회수 : " + boardArticle.hit);
             System.out.println("====================================");
         }
-        //6. 1) [PagingTest에서 쓰던 **로직 코드**] + 2) 미리 떼어놓고 객체로 가져다 쓰는 [리얼pagination객체.**변수**]를 이용해서
-        // -> << 페이지블럭 + 페이지 숫자 >> 부터 출력하게 한다. (게시물 나눠서뿌리는거말고)
-        // for (int i = startPageNoInBlock; i <= endPageNoInBlock; i++) {
-        //     if (i == currentPageNo) {
-        //         System.out.print("[" + i + "] ");
-        //         continue;
-        //     }
-        //     System.out.print(i + " ");
-        // }
-        // System.out.println();
 
-        //7. while문 [[안/팍 상관없이]] 변수들은 일단 가져와서 순서대로 모다놨으니, 객체. 변수로 변경해서 적용시킨다.
-        // -> 빨간 줄 든 변수들 앞에 pagination. 맡 붙이면 된다.
-        // -> 하고 테스트 -> list 명령어시 페이지가 잘나오는지 확인
-        for (int i = pagination.startPageNoInBlock; i <= pagination.endPageNoInBlock; i++) {
+        // 9.여기도, 변수로 쓰던 곳 -> 메서드호출로 업데이트된 값을 사용
+        // for (int i = pagination.startPageNoInBlock; i <= pagination.endPageNoInBlock; i++) {
+        for (int i = pagination.getStartPageNoInBlock(); i <= pagination.getEndPageNoInBlock(); i++) {
             if (i == pagination.currentPageNo) {
                 System.out.print("[" + i + "] ");
                 continue;
@@ -473,10 +464,6 @@ public class Board {
             System.out.print(i + " ");
         }
         System.out.println();
-
-        //8. 이제 page명령어를 받아서 -> 이전/다음을 받아 -> 현재 페이지 번호를 컨트롤 하게 해야함.
-        // -> 기능추가하러 가자. -> 9.
-
     }
 }
 
