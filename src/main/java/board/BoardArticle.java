@@ -12,4 +12,8 @@ public class BoardArticle extends BaseArticle {
         this.memberId = memberId;
         this.hit = hit;
     }
+
+    public BoardArticle() {
+
+    }
 }

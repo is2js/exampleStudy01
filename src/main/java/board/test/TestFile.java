@@ -18,7 +18,7 @@ public class TestFile {
         // manager.loadArticleFromFile("C:/java_file_test/article/article_1.txt");
         // manager.loadArticleFromFile("C:/java_file_test/article/article_2.txt");
         //5. 테스트
-        manager.loadArticleFromFile(5);
+        // manager.loadArticleFromFile(5);
 
 
 
