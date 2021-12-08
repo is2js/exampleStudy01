@@ -107,50 +107,7 @@ public class Board {
     private void page() {
         while (true) {
             System.out.print("페이징 명령어를 입력해주세요 ((1. 이전,  2. 다음,  3. 선택,  4. 뒤로가기): ");
-            //1.[문자열숫자를 받는 부분]은 -> [parseInt하는] 부분에서 에러 발생가능하므로 예외처리를 한다
-            // -> try 밑에서도 써야하는 변수선언은, 위에 미리 default값으로 선언해놓고 try내부에선 할당만
-            // int pageCommand = Integer.parseInt(scanner.nextLine());
-
-            //8. 메서드로 무한반복으로 올바른값 입력받고 난 뒤 parsing된 int를 받는다.
-            // -> 인자로 스캐너 입력값을 받는다!
-            // int pageCommand = 0;
             int pageCommand = inputIntData();
-            //9. parseInt쓰는 모든 곳을 convertStringToInt(scanner.nextLine())로 변환
-
-
-            // try{
-            //     pageCommand = Integer.parseInt(scanner.nextLine());
-            // } catch (NumberFormatException e) {
-            //     // 2. catch부분은 해당 예외발생시, 프로그램 끄지말고 이 코드를 실행해줘! 다
-            //     System.out.println("숫자만 입력해야 합니다.");
-            //     // 3. 종료를 안시키니 밑으로 타고 내려가는데,
-            //     // -> 에러가 나면 pageCommand는 defatul값 0으로 내려가므로,
-            //     // -> 분기를 안탄다.
-            //     // -> 분기 안타면, list() 호출후 다시 반복문 반복되므로..
-            //     // -> 분기 안타는 제일 끝엔.. 예외처리를 해줬었는데
-            //     // -> 여기서는 여러분기상 list()를 태워야하니..
-            //     // -> [[[default값 분기]]]를 세로 만들자.
-            // }
-            //4. 원래는 분기예외처리를, if continue 분기들 -> 안걸리는 부분 = 예외 = 분기없는 맨끝에서 처리였으나
-            // -> 모든 분기마다 if 처리 후, continue없이,  공통작업 list()호출인 상황에서는
-            // -> [입력받지 않은 default 값으로 분기 생성]하여 예외처리 되게 한다.
-
-            //5. 만약 올바른 값이 입력될때까지 계속해서 받아야한다면???
-            // -> while (true)안에 집어넣고, try 제대로 파싱시 break; catch 끄지말고, 여기서 그대로 내려가면 다시 while문으로..
-            // --> [[try parse.Int시에만 while (true) 탈출]]하게 작성하면, 올바른값입력할때까지 계속 입력 받을 수 있다.
-            // while (true) {
-            //     try {
-            //         pageCommand = Integer.parseInt(scanner.nextLine());
-            //         // 1) 파싱성공시 탈출부만 있으면, 올바른 값 -> 파싱성공-> break 외에는 무한반복이 되게 할 수 있다.
-            //         break;
-            //     } catch (NumberFormatException e) {
-            //         // 2) catch부분에서는 그냥 흘러가면 알아서, 무한 입력 시도가 된다.
-            //         // -> parseInt로 검색해서, 파싱하는 부분은 다 이렇게 만들어주면 예외처리가 된다.
-            //         // -> 그런데 integer쓰는 곳마다 try/catch 다해주면 번거러우니 메소드로 만든다.
-            //         // -> 7. 메소드에 짤라넣음.
-            //         System.out.println("숫자만 입력해야 합니다.");
-            //     }
-            // }
 
             if (pageCommand == 0) {
                 System.out.println(" 알 수 없는 명령입니다.");

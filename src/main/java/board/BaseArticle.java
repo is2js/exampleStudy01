@@ -1,9 +1,9 @@
 package board;
 
 public class BaseArticle {
-    int id;
-    String body;
-    String regDate;
-    int memberId;
-    String nickname;
+    public int id;
+    public String body;
+    public String regDate;
+    public int memberId;
+    public String nickname;
 }

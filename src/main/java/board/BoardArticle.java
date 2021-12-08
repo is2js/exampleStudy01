@@ -1,8 +1,8 @@
 package board;
 
 public class BoardArticle extends BaseArticle {
-    String title;
-    int hit;
+    public String title;
+    public int hit;
 
     public BoardArticle(int id, String title, String body, String regDate, int memberId, int hit) {
         this.id = id;
