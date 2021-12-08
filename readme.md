@@ -1,3 +1,10 @@
+### day12(파일입출력)
+1. 가장 쉬운 FileWriter, FileReader -> BufferedReader(reader)를 쓰고 `/`로 파일경로를 주며, `IOException`, `FileNotFoundException`으로 catch를 `직접` 강제해야한다. 
+   1. FileWriter는 IOException를 직접 try/catch한다
+   2. FileReader -> BufferedReader는 1) catch  FileNotFoundException 2) catch  IOException  2개를 예외처리해준다.
+      1. BufferedReader가 readLine()이 있기 때문에 사용한다.
+      2. 다음 라인이 없으면 null을 반환하기 때문에  -> while (업데이트 변수, 결과값 변수 != null ) 로 받아온다. 
+
 ### day11(interface 사례3)
 1. 구현체중 택1 객체생성메서드보유 Manager Class (구현X -> 자동분기X, static객체생성메서드에서 분기별retype만 `다형성`만 이용)
    1. Manage Class : static 객체 생성 method의 retypeType에 interface다형성을 이용함. 분기는 파라미터로 받아서 직접 if로함.

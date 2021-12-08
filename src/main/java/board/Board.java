@@ -170,17 +170,10 @@ public class Board {
 
     }
 
-    //7. String입력(scanner.nextLine()을 받을예정!)을 받아서 -> paringInt가 성공할때까지 시도하다가 - int를 반환해주는 메소드다.
     private int inputIntData() {
-        // 1) try에서 성공시 숫자로 받아줄 변수 with default값 생성
         int convertedData = 0;
         while (true) {
             try {
-                // 2) scanner.nextLine() -> 이제 메서드밖에서 파라미터 String data로 들어올 것이니 변경
-                // -> 이렇게 될 경우, 한번 호출시,, 입력이 무조건 data로 고정되어버린다.
-                // -> 파라미터를 없애고, scanner를 매번 호출하도록 변경함.
-                // --> **반복문을 포함한 메서드에서는 스캐너값을 인자로 넣지말고, 메서드 내부에서  스캐너를 쓰자!!**
-                // --> 그래야 매번 반복문에서 호출시마다 새롭게 값을 받아준다.
                 convertedData = Integer.parseInt(scanner.nextLine());
                 break;
             } catch (NumberFormatException e) {
@@ -188,7 +181,6 @@ public class Board {
             }
         }
         return convertedData;
-
     }
 
     private void sort() {
