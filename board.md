@@ -356,11 +356,27 @@
                       - 파라미터 없이 `생성자 내부에 매번 defaul값` this.position = 0;`을 채워준다.`
                       - **생성자에서 매번 default값 넣어주는 것보다 -> `인변 선언부에서 이미 defaul값으로 초기화` private int position = 0;해주는게 낫다**
        3. `빈객체 생성 -> txt split해서 채워주기 -> 객체 완성`의 로직도 FileManager에 메서드로 넣어준다.
-       4. `loadArticleFromFile() 내부`에서 
-          1. FileReader, BufferedReader -> 읽어온 누적 string을 누적한 뒤 -> 출력했었으나 출력부분은 삭제하고
-          2. String -> 객체로 반환해주는 `getBoardArticleFromString()`를 사용한 뒤
-          3. 객체를 반환해준다.
-             1. 객체 반환시, try문내에서 하는 것 X - > 메서드();호출후 받을 객체 참조변수는 try문 밖 -> return도 try/catch끝난 try문 밖에서 return되게 한다.
+    4. `loadArticleFromFile() 내부`에서 
+       1. FileReader, BufferedReader -> 읽어온 누적 string을 누적한 뒤 -> 출력했었으나 출력부분은 삭제하고
+       2. String -> 객체로 반환해주는 `getBoardArticleFromString()`를 사용한 뒤
+       3. 객체를 반환해준다.
+          1. 객체 반환시, try문내에서 하는 것 X - > 메서드();호출후 받을 객체 참조변수는 try문 밖 -> return도 try/catch끝난 try문 밖에서 return되게 한다.
+    5. 최종 적용하기
+       1. **먼저 `id로 하나씩 가져오는 부분` 대체시키기**본문에 readArticles()에 있는 `getArticleByArticleNumber()`부터
+          1. 기존: input으로 id를 받아 -> list에서 객체 읽어오는 부분getArticleByArticleNumber( id )
+             1. BoardArticle boardArticle = getArticleByArticleNumber(target);
+          2. 변경: `FileManager`의 객체 읽어오는 부분으로 수정하기
+             2. BoardArticle boardArticle = fileManager.loadArticleFromFile(target);
+          3. **그 이외에 getArticleByArticleNumber()가 사용된 부분을 전체 검색해서 다 fileManager.loadArticleFromFile()로 변경하자.**
+       2. **`빈 객체리스트 -> 초기데이터 생성과 동시에 add`을 대체시켜야한다.**
+          1. 기존: `초기 테스트데이터 여러개`  -> 생성과 동시에 `빈List에 add` 넣어서 사용이 아닌 
+          2. 변경: `txt로 하나씩 다 읽은 뒤 ` -> `null로 초기화하고 FileManager로 읽은 list를 통째로 할당`
+             **- add용 빈 리스트가 더이상 필요없음. add없이 통째로 읽은 뒤, list 통째로 대입할 것이기 때문**
+       3. File객체에 폴더경로만 넣고 .list()를 돌리면, 파일명 리스트를 반환해줌
+       4. id로 객체 반환했지만, String(파라미터)으로 반환시킬 수도 있다.
+          1. 파라미터 다르면 다른 메서드!
+             1. 두 메서드의 공통코드를 -> 사용할 한쪽 살리고 -> 사용안할 것은 공통코드 지운 뒤 -> 사용할 메서드를 내부에서 호출하도록 수정시키기
+                1. ex> id 받아서 -> 공통파일명 + id ->  filename -> 살린 메서드호출
        
 
 
@@ -390,6 +406,8 @@
     - 기존: 생성시 파라미터 다 집어넣어 완성
     - 새로운: `빈 객체`를 생성할 수 있게, `노 파라미터 생성자`를 정의하면서 빈 객체 생성
       - `빈 객체`에다가 일일이 `빈객체.변수 = 값 하나씩 할당해줘서 완성`하기
+  - 객체완성된 코드를 메서드화 -> load From File() 메소드 내부에서 가져와 -> load()메서드가 객체 반환하도록 하게 하기
+  - ㄴ
 
 ## 요구사항 - 파일 입출력
 - 게시물 데이터는 현재 ArrayList에 저장되고 있습니다. 이는 프로그램이 진행되는 동안 할당받은 메모리에 저장되는 것으로 프로그램이 종료되면 사라지는 데이터입니다. 우리가 저장 또는 수정한 게시물들이 지속적으로 유지되려면 파일 형태로 디스크에 남겨야 합니다. 파일 입출력을 이용해 게시물을 저장 및 관리해주세요.

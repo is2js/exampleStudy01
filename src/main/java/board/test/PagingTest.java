@@ -30,25 +30,8 @@ public class PagingTest {
                 System.out.println(datas.get(i));
                 System.out.println("=============");
             }
-            // my1) Board에 적용시켰으면 주석처리 해버리자 ㅋ
-            // for (int i = startPageNoInBlock; i <= endPageNoInBlock; i++) {
-            //     if (i == currentPageNo) {
-            //         System.out.print("[" + i + "] ");
-            //         continue;
-            //     }
-            //     System.out.print(i + " ");
-            // }
-            // System.out.println();
 
             System.out.println("1. 다음, 2. 이전");
-            //my2)
-            // int pcmd = Integer.parseInt(scanner.nextLine());
-            // if (pcmd == 1) {
-            //     currentPageNo++;
-            // }
-            // if (pcmd == 2) {
-            //     currentPageNo--;
-            // }
         }
     }
 }

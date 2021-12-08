@@ -11,7 +11,12 @@ import board.util.MyUtil;
 public class Board {
 
     Scanner scanner = new Scanner(System.in);
-    ArrayList<BoardArticle> boardArticles = new ArrayList<>();
+    //2. 이제부터  빈 객체리스트 -> 초기데이터 생성과 동시에 add가 아니라
+    // -> txt로 하나씩 다 읽은 뒤 [[[[[[리스트를 통째로  넣어줄 것]]]]]]임 ->[[ null로 일단 초기화]]
+    // ArrayList<BoardArticle> boardArticles = new ArrayList<>();
+    // -> add용 빈 리스트가 더이상 필요없음. add없이 통째로 읽은 뒤, list 통째로 대입할 것이기 때문
+    ArrayList<BoardArticle> boardArticles = null;
+
     ArrayList<Member> members = new ArrayList<>();
     ArrayList<ReplyArticle> replies = new ArrayList<>();
     ArrayList<Like> likes = new ArrayList<>();
@@ -20,14 +25,15 @@ public class Board {
     int replyArticleNumber = 1; // 댓글 고유번호
     Member loginedMember = null;
     String dateFormat = "yyyy.MM.dd";
+    // 바뀐 코드를..보면.. 여기는 변수선언만 -> 생성자에서 new Pagination( boardArticles.size());로 초기화 하도록 코드바뀜.. 나중에 확인
     Pagination pagination = new Pagination();
-    // 1. 파일입출력도 어디든 많이 쓰이니, 싱글톤관리자 역할을 하는 Board 클래스에 전역변수로 만들어준다.
-    // -> 이제 article 생성후 list에 add해주는 곳(makeTestData)에 가서,
-    // -> new 객체생성 -> list.add  해주는 로직을  -> 파일매니져. 객체1개씩  파일로 저장 하도록 바꿔본다.
-    // -> 2.
     FileManager fileManager = new FileManager();
 
     public Board() {
+        //3. 초기데이터 생성해서 빈리스트add하는 대신, 메서드로 txt들->list통으로 생성 -> 대입만 해주는 메서드를 호출해준다.
+        // -> makeTestData()에는 빈리스트add말고 다른 로직도 있어서 일단 살려둔다.
+        // boardArticles = fileManager.getAllArticles(); -> 없는 메서드라 빨간줄 -> 만들러간다.
+        boardArticles = fileManager.getAllArticles();
         makeTestData();
     }
 
@@ -211,7 +217,13 @@ public class Board {
     private void readArticles() {
         System.out.print("상세보기할 게시물 번호를 입력해주세요 : ");
         int target = inputIntData();
-        BoardArticle boardArticle = getArticleByArticleNumber(target);
+
+        //1.
+        // BoardArticle boardArticle = getArticleByArticleNumber(target);
+        BoardArticle boardArticle = fileManager.loadArticleFromFile(target);
+        // -> 메서드바꾸고 테스트해보기 -> read, 3
+        // --> 작성자가 null로 나오는 이유는  memberId -> 작성자 추출하는 부분을 작성안했기 때문 (나중에)
+
         if (boardArticle == null) {
             System.out.println("없는 게시물 번호입니다.");
             return;
@@ -320,17 +332,11 @@ public class Board {
 
     private void makeTestData() {
         String currentDate = MyUtil.getCurrentDate(dateFormat);
-        //2. 파일저장을 [ new 객체(); 로 객체 생성 -> list에 add 한 곳 ]마다 가서, 그 객체를 나도 생성해서 넣어준다.
-        // boardArticles.add(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
-        // boardArticles.add(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
-        // boardArticles.add(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
         fileManager.saveArticleToFile(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
         fileManager.saveArticleToFile(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
         fileManager.saveArticleToFile(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
 
         for (int i = 4; i<=30; i++) {
-            //3. 마찬가지 [객체생성 -> list에 add한 곳마다] 가서 파일저장으로 바꾼다.
-            // boardArticles.add(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
             fileManager.saveArticleToFile(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
 
         }
@@ -358,7 +364,8 @@ public class Board {
     private void deleteArticle() {
         System.out.print("삭제할 게시물 번호 : ");
         int target = inputIntData();
-        BoardArticle boardArticle = getArticleByArticleNumber(target);
+        // BoardArticle boardArticle = getArticleByArticleNumber(target);
+        BoardArticle boardArticle = fileManager.loadArticleFromFile(target);
 
         if (boardArticle == null) {
             System.out.println("없는 게시물 번호입니다.");
@@ -373,7 +380,7 @@ public class Board {
     private void updateArticle() {
         System.out.print("수정할 게시물 번호 : ");
         int target = inputIntData();
-        BoardArticle boardArticle = getArticleByArticleNumber(target);
+        BoardArticle boardArticle = fileManager.loadArticleFromFile(target);
         if (boardArticle == null) {
             System.out.println("없는 게시물 번호입니다.");
             return;

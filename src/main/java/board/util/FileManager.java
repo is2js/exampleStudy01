@@ -1,18 +1,29 @@
 package board.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import board.BoardArticle;
+import sun.security.util.BitArray;
 
 public class FileManager {
-    public BoardArticle loadArticleFromFile(int id) {
-        String file = "C:/java_file_test/article/article_" + id + ".txt";
-        
-        //14. try문안에서만 할당 -> return은 밖에서 되어야함 -> 변수 생성도 밖
+
+    // 9. File객체 -> 파일명 -> 이제 id만 추출해야지.. 객체를 가져올 수 있음.
+    // -> 파일명에서 id를 따로 추출하는 작업 -> 역으로 또 일하는 것이니
+    // --> id받는 버전말고, id가 포함된 파일명 받는 버전으로 loadArticleFromFile( String fileName)을 하나 더 만들어주자.
+    public BoardArticle loadArticleFromFile(String fileName) {
+        // String file = "C:/java_file_test/article/article_" + id + ".txt";
+        String file = "C:/java_file_test/article/" + fileName;
+
+        //10. 파라미터가 다르면, 다른함수다. 하지만 안에 내용이 겹치니,
+        // 1) 공통코드를 메서드화 해도 되겠지만.
+        // 2) 한쪽은 살리고, 다른한쪽이 살려진 메서드()를 통째로 활용하도록 해보자.
+        // --> id를 받아서 만드는놈은 -> id받고 -> fileName만들고 -> 여기 메서드를 호출하도록 수정하자.
         BoardArticle boardArticle = null;
 
         try {
@@ -30,25 +41,25 @@ public class FileManager {
 
             br.close();
             reader.close();
-            // 11. 이제 txt->  읽어온 누적 String을 출력하지 말고
-            // -> 객체로 변환한 뒤 -> 객체를 반환해주는 식으로 바꾸자.
-            // System.out.println(line);
-            // BoardArticle boardArticle = getBoardArticleFromString(line);
+
             boardArticle = getBoardArticleFromString(line);
-            //12. 반환해야함 -> 여기서 바로 하지말고 -> try/catch 밖에서...ㅠ
-            // return boardArticle;
 
         } catch (FileNotFoundException e) {
             System.out.println("파일이 없습니다..");
         } catch (IOException e) {
             System.out.println("파일 읽기 중 문제가 발생했습니다.");
         }
-        //13. try문내에서만 return해주면.. catch된 경우는 return이 없어진다.
-        // -> try밖에서 return한다. -> 
+
         return boardArticle;
     }
 
-    // 10. target String -> 객체 반환하는 메서드를 만들고, 내부코드를 복붙한다.
+    public BoardArticle loadArticleFromFile(int id) {
+        //11. id를 받는 메서드에서 공통부분 삭제 -> id -> fileName만들고 -> 살린메서드 호출
+        // String file = "C:/java_file_test/article/article_" + id + ".txt";
+        String fileName = "article_" + id + ".txt";
+        return loadArticleFromFile(fileName);
+    }
+
     public BoardArticle getBoardArticleFromString(String target) {
         BoardArticle boardArticle = new BoardArticle();
 
@@ -99,4 +110,25 @@ public class FileManager {
         }
     }
 
+    public ArrayList<BoardArticle> getAllArticles() {
+        // 4. 전체 다 가져오려면, pc파일들을 관리해주는 File이라는 클래스를 이용해야한다.
+        // -> 5. TestFile 에서 연습하고 온다.
+
+
+        //13. 받아줄 list생성
+        ArrayList<BoardArticle> articles = new ArrayList<>();
+
+        //12. 이제 부모폴더를 File객체에 -> file명리스트(배열) -> filename으로 객체 얻어오는 메소드()로 까지 완성했으니
+        // 파일명 리스트를 받아오자.
+        File articleFolder = new File("c:/java_file_test/article");
+        String[] articleFileNames = articleFolder.list();
+
+        for (String articleFileName : articleFileNames) {
+            BoardArticle boardArticle = loadArticleFromFile(articleFileName);
+
+            articles.add(boardArticle);
+        }
+
+        return articles;
+    }
 }
