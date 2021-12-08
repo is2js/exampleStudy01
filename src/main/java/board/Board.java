@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
+import board.util.FileManager;
 import board.util.MyUtil;
 
 public class Board {
@@ -20,7 +21,11 @@ public class Board {
     Member loginedMember = null;
     String dateFormat = "yyyy.MM.dd";
     Pagination pagination = new Pagination();
-
+    // 1. 파일입출력도 어디든 많이 쓰이니, 싱글톤관리자 역할을 하는 Board 클래스에 전역변수로 만들어준다.
+    // -> 이제 article 생성후 list에 add해주는 곳(makeTestData)에 가서,
+    // -> new 객체생성 -> list.add  해주는 로직을  -> 파일매니져. 객체1개씩  파일로 저장 하도록 바꿔본다.
+    // -> 2.
+    FileManager fileManager = new FileManager();
 
     public Board() {
         makeTestData();
@@ -315,11 +320,19 @@ public class Board {
 
     private void makeTestData() {
         String currentDate = MyUtil.getCurrentDate(dateFormat);
-        boardArticles.add(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
-        boardArticles.add(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
-        boardArticles.add(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
+        //2. 파일저장을 [ new 객체(); 로 객체 생성 -> list에 add 한 곳 ]마다 가서, 그 객체를 나도 생성해서 넣어준다.
+        // boardArticles.add(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
+        // boardArticles.add(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
+        // boardArticles.add(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
+        fileManager.saveArticleToFile(new BoardArticle(1, "안녕하세요", "내용1입니다.", currentDate, 1, 20));
+        fileManager.saveArticleToFile(new BoardArticle(2, "반갑습니다.", "내용2입니다.", currentDate, 2, 100));
+        fileManager.saveArticleToFile(new BoardArticle(3, "안녕안녕", "내용3입니다.", currentDate, 1, 30));
+
         for (int i = 4; i<=30; i++) {
-            boardArticles.add(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
+            //3. 마찬가지 [객체생성 -> list에 add한 곳마다] 가서 파일저장으로 바꾼다.
+            // boardArticles.add(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
+            fileManager.saveArticleToFile(new BoardArticle(i, "제목" + i, "내용" + i, currentDate, 1, 30));
+
         }
 
         members.add(new GeneralMember(1, "aaa", "aaa", "조재성"));
